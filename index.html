@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Money Tracker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script>
-        // Tailwind CSS configuration
         tailwind.config = {
             theme: {
                 extend: {
@@ -21,94 +20,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
         /* Styling for dynamic elements */
-        .profile-item, .transaction-item {
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .profile-item:hover {
-            background-color: #f0f9ff; /* light blue hover */
-            border-left-color: #7dd3fc; /* sky-300 */
-        }
-        .profile-item.active {
-            background-color: #e0f2fe; /* sky-100 */
-            border-left-width: 4px;
-            border-left-color: #0ea5e9; /* sky-500 */
-            font-weight: 500;
-        }
-         .profile-item.active .profile-name {
-            color: #0284c7; /* sky-600 */
-        }
-        .transaction-item:hover {
-            background-color: #f8fafc; /* slate-50 */
-        }
-        /* Icons alignment */
-        .icon-text-align {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .profile-item, .transaction-item, .category-item { transition: background-color 0.3s ease, border-color 0.3s ease; }
+        .profile-item:hover { background-color: #f0f9ff; /* light blue hover */ border-left-color: #7dd3fc; /* sky-300 */ }
+        .profile-item.active { background-color: #e0f2fe; /* sky-100 */ border-left-width: 4px; border-left-color: #0ea5e9; /* sky-500 */ font-weight: 500; }
+        .profile-item.active .profile-name { color: #0284c7; /* sky-600 */ }
+        .transaction-item:hover, .category-item:hover { background-color: #f8fafc; /* slate-50 */ }
+        .icon-text-align { display: inline-flex; align-items: center; gap: 0.5rem; }
         /* Modal styling */
-        .modal {
-            display: none; /* Hidden by default, JS will control this */
-            position: fixed;
-            z-index: 50;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-            align-items: center; 
-            justify-content: center;
-        }
-        .modal.modal-open { /* Class to show modal */
-            display: flex;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            padding: 24px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            animation: modalOpenAnimation 0.3s ease-out;
-        }
-        @keyframes modalOpenAnimation { /* Renamed to avoid conflict */
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .modal-close-btn {
-            transition: transform 0.2s ease-in-out, background-color 0.2s;
-        }
-        .modal-close-btn:hover {
-            transform: rotate(90deg);
-            background-color: #e2e8f0; /* slate-200 */
-        }
-        /* Custom focus rings for better visibility */
-        input:focus, select:focus, button:focus-visible {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-            box-shadow: 0 0 0 2px theme('colors.sky.500');
-        }
-        .transaction-item button {
-            min-width: 32px; 
-            min-height: 32px;
-        }
+        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal.modal-open { display: flex; }
+        .modal-content { background-color: #fefefe; padding: 24px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: modalOpenAnimation 0.3s ease-out; }
+        @keyframes modalOpenAnimation { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-close-btn { transition: transform 0.2s ease-in-out, background-color 0.2s; }
+        .modal-close-btn:hover { transform: rotate(90deg); background-color: #e2e8f0; /* slate-200 */ }
+        input:focus, select:focus, button:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 2px theme('colors.sky.500'); }
+        .transaction-item button, .category-item button { min-width: 32px; min-height: 32px; }
     </style>
 </head>
 <body class="bg-slate-100 font-sans antialiased">
@@ -117,7 +48,6 @@
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-bold text-sky-600">MoneyTrack</h1>
             </div>
-
             <div class="flex-grow">
                 <div class="flex justify-between items-center mb-3">
                     <h2 class="text-lg font-semibold text-slate-700">Profiles</h2>
@@ -125,14 +55,12 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
                     </button>
                 </div>
-                <div id="profilesList" class="space-y-1.5 max-h-60 md:max-h-80 overflow-y-auto pr-1">
-                    </div>
+                <div id="profilesListEl" class="space-y-1.5 max-h-60 md:max-h-80 overflow-y-auto pr-1"></div>
                 <button id="viewAllProfilesBtn" class="mt-4 w-full flex items-center justify-center gap-2 text-sm py-2.5 px-4 rounded-lg bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                     View All Profiles
                 </button>
             </div>
-
             <div class="space-y-4 pt-4 border-t border-slate-200">
                 <div>
                     <h2 class="text-md font-semibold text-slate-700 mb-2">App Settings</h2>
@@ -144,6 +72,10 @@
                         <option value="EUR">EUR - Euro</option>
                         <option value="SGD">SGD - Singapore Dollar</option>
                     </select>
+                    <button id="manageCategoriesBtn" class="mt-3 w-full flex items-center justify-center gap-2 text-sm py-2 px-4 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 active:bg-slate-400 transition-colors shadow-sm">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-plus"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/></svg>
+                        Manage Categories
+                    </button>
                 </div>
                 <div class="space-y-2">
                      <h2 class="text-md font-semibold text-slate-700 mb-2">Data Management</h2>
@@ -165,7 +97,6 @@
                 <h2 id="currentProfileNameDisplay" class="text-3xl font-bold text-slate-800">Dashboard</h2>
                 <p id="profileCurrencyInfoDisplay" class="text-sm text-slate-500">Select a profile or view all.</p>
             </header>
-
             <section id="summarySection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl shadow-md">
                     <h3 class="text-lg font-semibold text-green-600 mb-2 icon-text-align">
@@ -189,7 +120,6 @@
                     <p id="netBalanceDisplay" class="text-3xl font-bold text-slate-700">Rp0</p>
                 </div>
             </section>
-
             <section class="mb-8 flex flex-col sm:flex-row gap-4">
                 <button id="addIncomeBtn" class="flex-1 icon-text-align justify-center py-3 px-6 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 active:bg-green-700 transition-colors shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
@@ -200,7 +130,6 @@
                     Add Outcome
                 </button>
             </section>
-
             <section id="transactionsSection">
                 <h3 class="text-2xl font-semibold text-slate-700 mb-4">Recent Transactions</h3>
                 <div id="transactionsListContainer" class="bg-white p-2 rounded-xl shadow">
@@ -265,7 +194,13 @@
                     <label for="transactionAmountInput" class="block text-sm font-medium text-slate-600 mb-1">Amount</label>
                     <input type="number" id="transactionAmountInput" name="amount" step="any" min="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
                 </div>
-                <div class="mb-6">
+                <div class="mb-4">
+                    <label for="transactionCategoryInput" class="block text-sm font-medium text-slate-600 mb-1">Category</label>
+                    <select id="transactionCategoryInput" name="category" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
+                        <option value="">-- Select Category --</option>
+                    </select>
+                </div>
+                <div class="mb-6"> 
                     <label for="transactionDateInput" class="block text-sm font-medium text-slate-600 mb-1">Date & Time</label>
                     <input type="datetime-local" id="transactionDateInput" name="date" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
                 </div>
@@ -277,6 +212,55 @@
         </div>
     </div>
 
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold text-slate-700">Manage Categories</h3>
+                 <button id="closeCategoryModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="categoryForm" class="mb-6 pb-6 border-b border-slate-200">
+                 <input type="hidden" id="categoryIdInput">
+                 <div class="flex flex-col sm:flex-row gap-3 items-end">
+                     <div class="flex-grow">
+                         <label for="categoryNameInput" class="block text-sm font-medium text-slate-600 mb-1">Category Name</label>
+                         <input type="text" id="categoryNameInput" name="categoryName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
+                     </div>
+                     <div class="flex-shrink-0">
+                         <label for="categoryTypeInput" class="block text-sm font-medium text-slate-600 mb-1">Type</label>
+                         <select id="categoryTypeInput" name="categoryType" class="w-full sm:w-auto p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
+                             <option value="income">Income</option>
+                             <option value="outcome">Outcome</option>
+                             <option value="universal">Universal</option>
+                         </select>
+                     </div>
+                     <div class="flex-shrink-0">
+                        <button type="submit" id="saveCategoryBtn" class="w-full sm:w-auto py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors">
+                            <span id="saveCategoryBtnText">Add Category</span> 
+                        </button>
+                        <button type="button" id="cancelEditCategoryBtn" class="hidden w-full sm:w-auto py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 transition-colors ml-2">Cancel Edit</button>
+                     </div>
+                 </div>
+            </form>
+            <h4 class="text-lg font-semibold text-slate-700 mb-3">Existing Categories</h4>
+            <div id="categoriesList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                <p class="text-sm text-slate-500">Loading categories...</p>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="js/main.js"></script>
+    <script>
+        // It's good practice to call createIcons() after the DOM is fully loaded
+        // and potentially after dynamic content is added if you use data-lucide attributes.
+        // Since we are embedding SVGs directly in many places and calling it in ui.js after dynamic lists,
+        // this specific call here might be redundant but is harmless.
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        });
+    </script>
 </body>
 </html>
