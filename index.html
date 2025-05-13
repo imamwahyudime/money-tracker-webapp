@@ -19,27 +19,25 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom scrollbar */
+        /* Styles remain the same as previous version... */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
-        /* Styling for dynamic elements */
-        .profile-item, .transaction-item, .category-item { transition: background-color 0.3s ease, border-color 0.3s ease; }
-        .profile-item:hover { background-color: #f0f9ff; /* light blue hover */ border-left-color: #7dd3fc; /* sky-300 */ }
-        .profile-item.active { background-color: #e0f2fe; /* sky-100 */ border-left-width: 4px; border-left-color: #0ea5e9; /* sky-500 */ font-weight: 500; }
-        .profile-item.active .profile-name { color: #0284c7; /* sky-600 */ }
-        .transaction-item:hover, .category-item:hover { background-color: #f8fafc; /* slate-50 */ }
+        .profile-item, .transaction-item, .category-item, .rate-item { transition: background-color 0.3s ease, border-color 0.3s ease; }
+        .profile-item:hover { background-color: #f0f9ff; border-left-color: #7dd3fc; }
+        .profile-item.active { background-color: #e0f2fe; border-left-width: 4px; border-left-color: #0ea5e9; font-weight: 500; }
+        .profile-item.active .profile-name { color: #0284c7; }
+        .transaction-item:hover, .category-item:hover, .rate-item:hover { background-color: #f8fafc; }
         .icon-text-align { display: inline-flex; align-items: center; gap: 0.5rem; }
-        /* Modal styling */
         .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal.modal-open { display: flex; }
-        .modal-content { background-color: #fefefe; padding: 24px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: modalOpenAnimation 0.3s ease-out; }
+        .modal-content { background-color: #fefefe; padding: 24px; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: modalOpenAnimation 0.3s ease-out; }
         @keyframes modalOpenAnimation { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .modal-close-btn { transition: transform 0.2s ease-in-out, background-color 0.2s; }
-        .modal-close-btn:hover { transform: rotate(90deg); background-color: #e2e8f0; /* slate-200 */ }
+        .modal-close-btn:hover { transform: rotate(90deg); background-color: #e2e8f0; }
         input:focus, select:focus, button:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 2px theme('colors.sky.500'); }
-        .transaction-item button, .category-item button { min-width: 32px; min-height: 32px; }
+        .transaction-item button, .category-item button, .profile-item button { min-width: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center;}
     </style>
 </head>
 <body class="bg-slate-100 font-sans antialiased">
@@ -55,7 +53,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
                     </button>
                 </div>
-                <div id="profilesListEl" class="space-y-1.5 max-h-60 md:max-h-80 overflow-y-auto pr-1"></div>
+                <div id="profilesListEl" class="space-y-1.5 max-h-60 md:max-h-[calc(100vh-600px)] overflow-y-auto pr-1"></div>
                 <button id="viewAllProfilesBtn" class="mt-4 w-full flex items-center justify-center gap-2 text-sm py-2.5 px-4 rounded-lg bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                     View All Profiles
@@ -64,8 +62,8 @@
             <div class="space-y-4 pt-4 border-t border-slate-200">
                 <div>
                     <h2 class="text-md font-semibold text-slate-700 mb-2">App Settings</h2>
-                    <label for="appCurrencySelect" class="block text-xs font-medium text-slate-600 mb-1">Default New Profile Currency:</label>
-                    <select id="appCurrencySelect" name="currency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm">
+                    <label for="appDisplayCurrencySelect" class="block text-xs font-medium text-slate-600 mb-1">Display Currency (for All Profiles & New):</label>
+                    <select id="appDisplayCurrencySelect" name="currency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm">
                         <option value="IDR">IDR - Indonesian Rupiah</option>
                         <option value="USD">USD - US Dollar</option>
                         <option value="JPY">JPY - Japanese Yen</option>
@@ -77,16 +75,23 @@
                         Manage Categories
                     </button>
                 </div>
-                <div class="space-y-2">
+                <div id="exchangeRateInfoSection" class="pt-3 border-t border-slate-200">
+                    <h2 class="text-md font-semibold text-slate-700 mb-1">Exchange Rates</h2>
+                    <p class="text-xs text-slate-600">Base: <span id="exchangeRateBaseDisplay" class="font-medium">USD</span></p>
+                    <p class="text-xs text-slate-600">Last Updated: <span id="exchangeRateTimestampDisplay" class="font-medium">N/A</span></p>
+                    <button id="manageExchangeRatesBtn" class="mt-2 w-full text-xs py-1.5 px-3 rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300 active:bg-slate-400 transition-colors shadow-sm">Manage Rates</button>
+                </div>
+
+                <div class="space-y-2 pt-3 border-t border-slate-200">
                      <h2 class="text-md font-semibold text-slate-700 mb-2">Data Management</h2>
                     <button id="importDataBtn" class="w-full flex items-center justify-center gap-2 text-sm py-2 px-4 rounded-lg bg-slate-600 text-white hover:bg-slate-700 active:bg-slate-800 transition-colors shadow-sm">
                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                        Import Data
+                        Import App Data
                     </button>
                     <input type="file" id="importFile" class="hidden" accept=".json">
                     <button id="exportDataBtn" class="w-full flex items-center justify-center gap-2 text-sm py-2 px-4 rounded-lg bg-slate-600 text-white hover:bg-slate-700 active:bg-slate-800 transition-colors shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                        Export Data
+                        Export App Data
                     </button>
                 </div>
             </div>
@@ -98,164 +103,69 @@
                 <p id="profileCurrencyInfoDisplay" class="text-sm text-slate-500">Select a profile or view all.</p>
             </header>
             <section id="summarySection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <h3 class="text-lg font-semibold text-green-600 mb-2 icon-text-align">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-circle"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>
-                        Total Income
-                    </h3>
-                    <p id="totalIncomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <h3 class="text-lg font-semibold text-red-600 mb-2 icon-text-align">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-circle"><circle cx="12" cy="12" r="10"/><path d="m12 16-4-4 4-4"/><path d="M12 8v8"/></svg>
-                        Total Outcome
-                    </h3>
-                    <p id="totalOutcomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <h3 class="text-lg font-semibold text-sky-600 mb-2 icon-text-align">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-landmark"><line x1="12" x2="12" y1="22" y2="18"/><path d="M5 22V10l7-7 7 7v12"/><path d="M13 13h-2v8h2v-8Z"/><path d="M4 22h16"/><path d="m22 10-5 5V7l-5-5-5 5v3l-5-5Z"/></svg>
-                        Net Balance
-                    </h3>
-                    <p id="netBalanceDisplay" class="text-3xl font-bold text-slate-700">Rp0</p>
-                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-green-600 mb-2 icon-text-align"> <svg data-lucide="arrow-up-circle" width="24" height="24"><use xlink:href="#lucide-arrow-up-circle"/></svg> Total Income </h3> <p id="totalIncomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
+                <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-red-600 mb-2 icon-text-align"> <svg data-lucide="arrow-down-circle" width="24" height="24"><use xlink:href="#lucide-arrow-down-circle"/></svg> Total Outcome </h3> <p id="totalOutcomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
+                <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-sky-600 mb-2 icon-text-align"> <svg data-lucide="landmark" width="24" height="24"><use xlink:href="#lucide-landmark"/></svg> Net Balance </h3> <p id="netBalanceDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
             </section>
             <section class="mb-8 flex flex-col sm:flex-row gap-4">
-                <button id="addIncomeBtn" class="flex-1 icon-text-align justify-center py-3 px-6 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 active:bg-green-700 transition-colors shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-                    Add Income
-                </button>
-                <button id="addOutcomeBtn" class="flex-1 icon-text-align justify-center py-3 px-6 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 active:bg-red-700 transition-colors shadow-sm">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><line x1="5" x2="19" y1="12" y2="12"/></svg>
-                    Add Outcome
-                </button>
+                <button id="addIncomeBtn" class="flex-1 icon-text-align justify-center py-3 px-6 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 active:bg-green-700 transition-colors shadow-sm"> <svg data-lucide="plus" width="20" height="20"><use xlink:href="#lucide-plus"/></svg> Add Income </button>
+                <button id="addOutcomeBtn" class="flex-1 icon-text-align justify-center py-3 px-6 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 active:bg-red-700 transition-colors shadow-sm"> <svg data-lucide="minus" width="20" height="20"><use xlink:href="#lucide-minus"/></svg> Add Outcome </button>
             </section>
             <section id="transactionsSection">
                 <h3 class="text-2xl font-semibold text-slate-700 mb-4">Recent Transactions</h3>
                 <div id="transactionsListContainer" class="bg-white p-2 rounded-xl shadow">
                     <div id="transactionsListEl" class="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
-                        <div id="noTransactionsMessage" class="p-4 text-center text-slate-500">
-                            Select a profile to see transactions or add a new one.
-                        </div>
+                        <div id="noTransactionsMessage" class="p-4 text-center text-slate-500"> Select a profile to see transactions or add a new one. </div>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <div id="profileModal" class="modal">
+    <div id="profileModal" class="modal"> <div class="modal-content"> <div class="flex justify-between items-center mb-6"> <h3 id="profileModalTitle" class="text-xl font-semibold text-slate-700"></h3> <button id="closeProfileModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button> </div> <form id="profileForm"> <input type="hidden" id="profileIdInput"> <div class="mb-4"> <label for="profileNameInput" class="block text-sm font-medium text-slate-600 mb-1">Profile Name</label> <input type="text" id="profileNameInput" name="profileName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="mb-6"> <label for="profileCurrencyInput" class="block text-sm font-medium text-slate-600 mb-1">Currency</label> <select id="profileCurrencyInput" name="profileCurrency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm"> <option value="IDR">IDR</option> <option value="USD">USD</option> <option value="JPY">JPY</option> <option value="EUR">EUR</option> <option value="SGD">SGD</option> </select> </div> <div class="flex justify-end gap-3"> <button type="button" id="cancelProfileModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button> <button type="submit" id="saveProfileBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button> </div> </form> </div> </div>
+    <div id="transactionModal" class="modal"> <div class="modal-content"> <div class="flex justify-between items-center mb-6"> <h3 id="transactionModalTitle" class="text-xl font-semibold text-slate-700"></h3> <button id="closeTransactionModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button> </div> <form id="transactionForm"> <input type="hidden" id="transactionIdInput"> <input type="hidden" id="transactionTypeInput"> <div class="mb-4"> <label for="transactionDescriptionInput" class="block text-sm font-medium text-slate-600 mb-1">Description</label> <input type="text" id="transactionDescriptionInput" name="description" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="mb-4"> <label for="transactionAmountInput" class="block text-sm font-medium text-slate-600 mb-1">Amount</label> <input type="number" id="transactionAmountInput" name="amount" step="any" min="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="mb-4"> <label for="transactionCategoryInput" class="block text-sm font-medium text-slate-600 mb-1">Category</label> <select id="transactionCategoryInput" name="category" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> <option value="">-- Select --</option> </select> </div> <div class="mb-6"> <label for="transactionDateInput" class="block text-sm font-medium text-slate-600 mb-1">Date & Time</label> <input type="datetime-local" id="transactionDateInput" name="date" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="flex justify-end gap-3"> <button type="button" id="cancelTransactionModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button> <button type="submit" id="saveTransactionBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button> </div> </form> </div> </div>
+    <div id="categoryModal" class="modal"> <div class="modal-content"> <div class="flex justify-between items-center mb-6"> <h3 class="text-xl font-semibold text-slate-700">Manage Categories</h3> <button id="closeCategoryModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button> </div> <form id="categoryForm" class="mb-6 pb-6 border-b border-slate-200"> <input type="hidden" id="categoryIdInput"> <div class="flex flex-col sm:flex-row gap-3 items-end"> <div class="flex-grow"> <label for="categoryNameInput" class="block text-sm font-medium text-slate-600 mb-1">Name</label> <input type="text" id="categoryNameInput" name="categoryName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="flex-shrink-0"> <label for="categoryTypeInput" class="block text-sm font-medium text-slate-600 mb-1">Type</label> <select id="categoryTypeInput" name="categoryType" class="w-full sm:w-auto p-2 border border-slate-300 rounded-md shadow-sm" required> <option value="income">Income</option> <option value="outcome">Outcome</option> <option value="universal">Universal</option> </select> </div> <div class="flex-shrink-0"> <button type="submit" id="saveCategoryBtn" class="w-full sm:w-auto py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600"> <span id="saveCategoryBtnText">Add</span> </button> <button type="button" id="cancelEditCategoryBtn" class="hidden w-full sm:w-auto py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 ml-2">Cancel</button> </div> </div> </form> <h4 class="text-lg font-semibold text-slate-700 mb-3">Existing Categories</h4> <div id="categoriesList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div> </div> </div>
+
+    <div id="exchangeRateModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
-                <h3 id="profileModalTitle" class="text-xl font-semibold text-slate-700">Add New Profile</h3>
-                <button id="closeProfileModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn">
+                <h3 class="text-xl font-semibold text-slate-700">Manage Exchange Rates</h3>
+                 <button id="closeExchangeRateModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                 </button>
             </div>
-            <form id="profileForm">
-                <input type="hidden" id="profileIdInput">
+
+            <form id="exchangeRateForm">
                 <div class="mb-4">
-                    <label for="profileNameInput" class="block text-sm font-medium text-slate-600 mb-1">Profile Name</label>
-                    <input type="text" id="profileNameInput" name="profileName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
+                    <label for="rateBaseCurrencySelect" class="block text-sm font-medium text-slate-600 mb-1">Base Currency (for these rates):</label>
+                    <select id="rateBaseCurrencySelect" name="baseCurrency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm">
+                        </select>
+                    <p class="text-xs text-slate-500 mt-1">Changing the base will require recalculating other rates upon saving.</p>
                 </div>
-                <div class="mb-6">
-                    <label for="profileCurrencyInput" class="block text-sm font-medium text-slate-600 mb-1">Default Currency</label>
-                    <select id="profileCurrencyInput" name="profileCurrency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500">
-                        <option value="IDR">IDR - Indonesian Rupiah</option>
-                        <option value="USD">USD - US Dollar</option>
-                        <option value="JPY">JPY - Japanese Yen</option>
-                        <option value="EUR">EUR - Euro</option>
-                        <option value="SGD">SGD - Singapore Dollar</option>
-                    </select>
+
+                <div id="exchangeRatesListContainer" class="space-y-3 mb-6 max-h-72 overflow-y-auto pr-1">
+                    </div>
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center mt-2 mb-4 gap-2">
+                    <p class="text-xs text-slate-500">Rates are: 1 <span id="formBaseCurrencyLabel">USD</span> = X units of currency.</p>
+                    <div class="flex gap-2">
+                        <button type="button" id="importRatesBtn" class="text-xs py-1.5 px-3 rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">Import Rates</button>
+                        <button type="button" id="exportRatesBtn" class="text-xs py-1.5 px-3 rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">Export Rates</button>
+                    </div>
                 </div>
+                <input type="file" id="importRatesFile" class="hidden" accept=".json">
+
+
                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelProfileModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 active:bg-slate-200 transition-colors">Cancel</button>
-                    <button type="submit" id="saveProfileBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors">Save Profile</button>
+                    <button type="button" id="cancelExchangeRateModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 active:bg-slate-200 transition-colors">Cancel</button>
+                    <button type="submit" id="saveExchangeRatesBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors">Save Rates</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <div id="transactionModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="transactionModalTitle" class="text-xl font-semibold text-slate-700">Add New Transaction</h3>
-                 <button id="closeTransactionModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-                </button>
-            </div>
-            <form id="transactionForm">
-                <input type="hidden" id="transactionIdInput">
-                <input type="hidden" id="transactionTypeInput">
-                <div class="mb-4">
-                    <label for="transactionDescriptionInput" class="block text-sm font-medium text-slate-600 mb-1">Description</label>
-                    <input type="text" id="transactionDescriptionInput" name="description" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="transactionAmountInput" class="block text-sm font-medium text-slate-600 mb-1">Amount</label>
-                    <input type="number" id="transactionAmountInput" name="amount" step="any" min="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="transactionCategoryInput" class="block text-sm font-medium text-slate-600 mb-1">Category</label>
-                    <select id="transactionCategoryInput" name="category" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
-                        <option value="">-- Select Category --</option>
-                    </select>
-                </div>
-                <div class="mb-6"> 
-                    <label for="transactionDateInput" class="block text-sm font-medium text-slate-600 mb-1">Date & Time</label>
-                    <input type="datetime-local" id="transactionDateInput" name="date" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
-                </div>
-                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelTransactionModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 active:bg-slate-200 transition-colors">Cancel</button>
-                    <button type="submit" id="saveTransactionBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors">Save Transaction</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="categoryModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-semibold text-slate-700">Manage Categories</h3>
-                 <button id="closeCategoryModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-                </button>
-            </div>
-            <form id="categoryForm" class="mb-6 pb-6 border-b border-slate-200">
-                 <input type="hidden" id="categoryIdInput">
-                 <div class="flex flex-col sm:flex-row gap-3 items-end">
-                     <div class="flex-grow">
-                         <label for="categoryNameInput" class="block text-sm font-medium text-slate-600 mb-1">Category Name</label>
-                         <input type="text" id="categoryNameInput" name="categoryName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
-                     </div>
-                     <div class="flex-shrink-0">
-                         <label for="categoryTypeInput" class="block text-sm font-medium text-slate-600 mb-1">Type</label>
-                         <select id="categoryTypeInput" name="categoryType" class="w-full sm:w-auto p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" required>
-                             <option value="income">Income</option>
-                             <option value="outcome">Outcome</option>
-                             <option value="universal">Universal</option>
-                         </select>
-                     </div>
-                     <div class="flex-shrink-0">
-                        <button type="submit" id="saveCategoryBtn" class="w-full sm:w-auto py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors">
-                            <span id="saveCategoryBtnText">Add Category</span> 
-                        </button>
-                        <button type="button" id="cancelEditCategoryBtn" class="hidden w-full sm:w-auto py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 transition-colors ml-2">Cancel Edit</button>
-                     </div>
-                 </div>
-            </form>
-            <h4 class="text-lg font-semibold text-slate-700 mb-3">Existing Categories</h4>
-            <div id="categoriesList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                <p class="text-sm text-slate-500">Loading categories...</p>
-            </div>
         </div>
     </div>
 
     <script type="module" src="js/main.js"></script>
     <script>
-        // It's good practice to call createIcons() after the DOM is fully loaded
-        // and potentially after dynamic content is added if you use data-lucide attributes.
-        // Since we are embedding SVGs directly in many places and calling it in ui.js after dynamic lists,
-        // this specific call here might be redundant but is harmless.
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
                 lucide.createIcons();

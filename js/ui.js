@@ -1,7 +1,8 @@
 // js/ui.js
 import * as dom from './domElements.js';
 import * as state from './state.js';
-import { formatCurrency, formatDateTime } from './utils.js';
+import { formatCurrency, formatDateTime, convertCurrency } from './utils.js'; 
+import { CURRENCY_SYMBOLS } from './config.js'; 
 
 /**
  * Renders the entire application UI based on the current state.
@@ -12,88 +13,43 @@ export function renderApp() {
     renderDashboardHeader();
     renderDashboardSummary();
     renderTransactionsList();
-    dom.appCurrencySelect.value = state.getState().globalDefaultCurrency;
+    renderExchangeRateInfo(); 
+    dom.appDisplayCurrencySelect.value = state.getState().displayCurrency; 
     console.log("App rendering complete.");
-}
-
-/**
- * Renders the list of profiles in the sidebar.
- */
-function renderProfilesList() {
-    const { profiles, activeProfileId } = state.getState();
-    dom.profilesListEl.innerHTML = ''; 
-
-    if (profiles.length === 0) {
-        const p = document.createElement('p');
-        p.textContent = 'No profiles yet. Add one!';
-        p.className = 'text-sm text-slate-500 px-3 py-2';
-        dom.profilesListEl.appendChild(p);
-    } else {
-        profiles.forEach(profile => {
-            const profileItemContainer = document.createElement('div');
-            profileItemContainer.className = `profile-item p-3 rounded-md cursor-pointer border border-transparent hover:border-sky-300 flex justify-between items-center text-sm`;
-            if (profile.id === activeProfileId) {
-                profileItemContainer.classList.add('active');
-            }
-            profileItemContainer.dataset.profileId = profile.id;
-
-            const profileNameSpan = document.createElement('span');
-            profileNameSpan.className = 'profile-name font-medium text-slate-700 truncate flex-grow';
-            profileNameSpan.textContent = profile.name;
-            profileNameSpan.addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                state.updateState('activeProfileId', profile.id);
-                state.saveData();
-                renderApp(); 
-            });
-            profileItemContainer.appendChild(profileNameSpan);
-            
-            const controlsDiv = document.createElement('div');
-            controlsDiv.className = 'flex items-center gap-1.5 ml-2';
-
-            const editBtn = document.createElement('button');
-            editBtn.className = 'p-1 text-slate-500 hover:text-sky-600 rounded-md hover:bg-sky-100 transition-colors';
-            editBtn.title = `Edit profile: ${profile.name}`;
-            editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><line x1="18" x2="22" y1="2" y2="6"/><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"/></svg>`;
-            editBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                openProfileModal(profile.id);
-            });
-            controlsDiv.appendChild(editBtn);
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'p-1 text-slate-500 hover:text-red-600 rounded-md hover:bg-red-100 transition-colors';
-            deleteBtn.title = `Delete profile: ${profile.name}`;
-            deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`;
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                handleDeleteProfile(profile.id, profile.name);
-            });
-            controlsDiv.appendChild(deleteBtn);
-            profileItemContainer.appendChild(controlsDiv);
-            
-            profileItemContainer.addEventListener('click', (event) => { 
-                if (event.target === profileItemContainer) {
-                    state.updateState('activeProfileId', profile.id);
-                    state.saveData();
-                    renderApp();
-                }
-            });
-
-            dom.profilesListEl.appendChild(profileItemContainer);
-        });
-    }
-     if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
        lucide.createIcons(); 
     }
 }
 
-function renderDashboardHeader() { /* ... (no changes) ... */ 
-    const { activeProfileId, globalDefaultCurrency } = state.getState();
+function renderProfilesList() { /* ... (no changes from part 9) ... */ 
+    const { profiles, activeProfileId } = state.getState();
+    dom.profilesListEl.innerHTML = ''; 
+    if (profiles.length === 0) {
+        const p = document.createElement('p'); p.textContent = 'No profiles yet.'; p.className = 'text-sm text-slate-500 px-3 py-2'; dom.profilesListEl.appendChild(p);
+    } else {
+        profiles.forEach(profile => {
+            const itemContainer = document.createElement('div'); itemContainer.className = `profile-item p-3 rounded-md cursor-pointer border border-transparent hover:border-sky-300 flex justify-between items-center text-sm ${profile.id === activeProfileId ? 'active' : ''}`; itemContainer.dataset.profileId = profile.id;
+            const nameSpan = document.createElement('span'); nameSpan.className = 'profile-name font-medium text-slate-700 truncate flex-grow mr-2'; nameSpan.textContent = profile.name;
+            nameSpan.addEventListener('click', (e) => { e.stopPropagation(); state.updateState('activeProfileId', profile.id); state.saveData(); renderApp(); });
+            itemContainer.appendChild(nameSpan);
+            const controlsDiv = document.createElement('div'); controlsDiv.className = 'flex items-center gap-1 flex-shrink-0';
+            const editBtn = document.createElement('button'); editBtn.className = 'p-1 text-slate-500 hover:text-sky-600 rounded-md hover:bg-sky-100'; editBtn.title = `Edit: ${profile.name}`; editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><line x1="18" x2="22" y1="2" y2="6"/><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"/></svg>`;
+            editBtn.addEventListener('click', (e) => { e.stopPropagation(); openProfileModal(profile.id); }); controlsDiv.appendChild(editBtn);
+            const delBtn = document.createElement('button'); delBtn.className = 'p-1 text-slate-500 hover:text-red-600 rounded-md hover:bg-red-100'; delBtn.title = `Delete: ${profile.name}`;
+            delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`;
+            delBtn.addEventListener('click', (e) => { e.stopPropagation(); handleDeleteProfile(profile.id, profile.name); }); controlsDiv.appendChild(delBtn);
+            itemContainer.appendChild(controlsDiv);
+            itemContainer.addEventListener('click', (event) => { if (!event.target.closest('button')) { state.updateState('activeProfileId', profile.id); state.saveData(); renderApp(); } });
+            dom.profilesListEl.appendChild(itemContainer);
+        });
+    }
+}
+function renderDashboardHeader() { /* ... (no changes from part 10) ... */ 
+    const { activeProfileId, displayCurrency, exchangeRates } = state.getState(); 
     const activeProfile = state.getActiveProfile(); 
     if (activeProfileId === 'all') {
         dom.currentProfileNameDisplay.textContent = 'Dashboard - All Profiles';
-        dom.profileCurrencyInfoDisplay.textContent = `Summary across all profiles. Default currency: ${globalDefaultCurrency}`;
+        dom.profileCurrencyInfoDisplay.textContent = `Totals converted to ${displayCurrency}. Rates (vs ${exchangeRates.base}) last updated: ${formatDateTime(exchangeRates.lastUpdated)}`;
     } else if (activeProfile) {
         dom.currentProfileNameDisplay.textContent = `Dashboard - ${activeProfile.name}`;
         dom.profileCurrencyInfoDisplay.textContent = `Currency: ${activeProfile.currency}`;
@@ -103,22 +59,20 @@ function renderDashboardHeader() { /* ... (no changes) ... */
         if(activeProfileId !== 'all') { state.updateState('activeProfileId', 'all'); state.saveData(); }
     }
 }
-
-function renderDashboardSummary() { /* ... (no changes) ... */ 
-    const { profiles, activeProfileId, globalDefaultCurrency } = state.getState();
-    let totalIncome = 0, totalOutcome = 0, displayCurrency = globalDefaultCurrency;
+function renderDashboardSummary() { /* ... (no changes from part 10) ... */ 
+    const { profiles, activeProfileId, displayCurrency, exchangeRates } = state.getState();
+    let totalIncome = 0, totalOutcome = 0; let targetDisplayCurrency = displayCurrency;
     if (activeProfileId === 'all') {
-        profiles.forEach(p => p.transactions.forEach(t => { if (t.type === 'income') totalIncome += t.amount; else totalOutcome += t.amount; }));
+        profiles.forEach(p => { p.transactions.forEach(t => { const converted = convertCurrency(t.amount, p.currency, targetDisplayCurrency, exchangeRates); if (t.type === 'income') totalIncome += converted; else totalOutcome += converted; }); });
     } else {
-        const profile = state.getActiveProfile();
-        if (profile) { displayCurrency = profile.currency; profile.transactions.forEach(t => { if (t.type === 'income') totalIncome += t.amount; else totalOutcome += t.amount; }); }
+        const currentProfile = state.getActiveProfile();
+        if (currentProfile) { targetDisplayCurrency = currentProfile.currency; currentProfile.transactions.forEach(t => { if (t.type === 'income') totalIncome += t.amount; else totalOutcome += t.amount; }); }
     }
-    dom.totalIncomeDisplay.textContent = formatCurrency(totalIncome, displayCurrency);
-    dom.totalOutcomeDisplay.textContent = formatCurrency(totalOutcome, displayCurrency);
-    dom.netBalanceDisplay.textContent = formatCurrency(totalIncome - totalOutcome, displayCurrency);
+    dom.totalIncomeDisplay.textContent = formatCurrency(totalIncome, targetDisplayCurrency);
+    dom.totalOutcomeDisplay.textContent = formatCurrency(totalOutcome, targetDisplayCurrency);
+    dom.netBalanceDisplay.textContent = formatCurrency(totalIncome - totalOutcome, targetDisplayCurrency);
 }
-
-function renderTransactionsList() { /* ... (no changes, already displays category) ... */ 
+function renderTransactionsList() { /* ... (no changes from part 9) ... */ 
     const { profiles, activeProfileId } = state.getState(); 
     dom.transactionsListEl.innerHTML = ''; 
     let transactionsToDisplay = [];
@@ -148,51 +102,42 @@ function renderTransactionsList() { /* ... (no changes, already displays categor
             const delBtn = document.createElement('button'); delBtn.className = 'p-1.5 text-red-500 hover:text-red-700 rounded-md hover:bg-red-100'; delBtn.title = "Delete"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`; delBtn.onclick = () => handleDeleteTransaction(activeProfileId, t.id); controls.appendChild(delBtn); amountDiv.appendChild(controls);
         } item.appendChild(amountDiv); dom.transactionsListEl.appendChild(item);
     });
-    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }
-
-/**
- * Populates the category dropdown in the transaction modal.
- */
-function populateCategoryDropdown(transactionType) {
+function renderExchangeRateInfo() { /* ... (no changes from part 10) ... */ 
+    const { exchangeRates } = state.getState();
+    dom.exchangeRateBaseDisplay.textContent = exchangeRates.base;
+    dom.exchangeRateTimestampDisplay.textContent = formatDateTime(exchangeRates.lastUpdated);
+}
+function populateCategoryDropdown(transactionType) { /* ... (no changes from part 9) ... */ 
     const { categories } = state.getState();
     dom.transactionCategoryInput.innerHTML = '<option value="">-- Select Category --</option>'; 
-
-    const filteredCategories = categories.filter(cat => cat.type === transactionType || cat.type === 'universal');
-    
-    filteredCategories.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
-
-    filteredCategories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.id;
-        option.textContent = cat.name;
-        dom.transactionCategoryInput.appendChild(option);
-    });
+    const filtered = categories.filter(c => c.type === transactionType || c.type === 'universal');
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+    filtered.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name; dom.transactionCategoryInput.appendChild(opt); });
 }
 
 // --- Modal Management ---
-export function openProfileModal(profileToEditId = null) { /* ... (no changes) ... */ 
+export function openProfileModal(profileToEditId = null) { /* ... (no changes from part 9) ... */ 
     state.updateState('editingProfileId', profileToEditId);
     dom.profileModalTitle.textContent = profileToEditId ? 'Edit Profile' : 'Add New Profile';
     dom.profileForm.reset(); 
     if (profileToEditId) {
         const profile = state.getProfileById(profileToEditId);
         if (profile) { dom.profileIdInput.value = profile.id; dom.profileNameInput.value = profile.name; dom.profileCurrencyInput.value = profile.currency; } 
-        else { console.error(`Profile ${profileToEditId} not found`); state.updateState('editingProfileId', null); dom.profileIdInput.value = ''; dom.profileCurrencyInput.value = state.getState().globalDefaultCurrency; }
-    } else { dom.profileIdInput.value = ''; dom.profileCurrencyInput.value = state.getState().globalDefaultCurrency; }
+        else { console.error(`Profile ${profileToEditId} not found`); state.updateState('editingProfileId', null); dom.profileIdInput.value = ''; dom.profileCurrencyInput.value = state.getState().displayCurrency; }
+    } else { dom.profileIdInput.value = ''; dom.profileCurrencyInput.value = state.getState().displayCurrency; }
     dom.profileModal.classList.add('modal-open'); dom.profileNameInput.focus();
 }
-export function closeProfileModal() { /* ... (no changes) ... */ 
+export function closeProfileModal() { /* ... (no changes from part 9) ... */ 
     dom.profileModal.classList.remove('modal-open'); state.updateState('editingProfileId', null); 
 }
-
-export function openTransactionModal(type, transactionToEdit = null) { /* ... (no changes except calling populateCategoryDropdown) ... */ 
+export function openTransactionModal(type, transactionToEdit = null) { /* ... (no changes from part 9) ... */ 
     const activeProfile = state.getActiveProfile();
     if (!activeProfile) { alert("Please select a profile."); return; }
     state.updateState('editingTransactionId', transactionToEdit ? transactionToEdit.id : null);
     dom.transactionModalTitle.textContent = transactionToEdit ? `Edit ${type}` : `Add New ${type}`;
     dom.transactionForm.reset(); dom.transactionTypeInput.value = type; dom.transactionAmountInput.placeholder = `Amount in ${activeProfile.currency}`;
-    populateCategoryDropdown(type); // Populate categories based on type
+    populateCategoryDropdown(type); 
     if (transactionToEdit) {
         dom.transactionIdInput.value = transactionToEdit.id; dom.transactionDescriptionInput.value = transactionToEdit.description; dom.transactionAmountInput.value = transactionToEdit.amount; dom.transactionCategoryInput.value = transactionToEdit.categoryId || ''; 
         const dateForInput = new Date(transactionToEdit.date); dateForInput.setMinutes(dateForInput.getMinutes() - dateForInput.getTimezoneOffset()); dom.transactionDateInput.value = dateForInput.toISOString().slice(0,16);
@@ -202,106 +147,68 @@ export function openTransactionModal(type, transactionToEdit = null) { /* ... (n
     }
     dom.transactionModal.classList.add('modal-open'); dom.transactionDescriptionInput.focus();
 }
-export function closeTransactionModal() { /* ... (no changes) ... */ 
+export function closeTransactionModal() { /* ... (no changes from part 9) ... */ 
     dom.transactionModal.classList.remove('modal-open'); state.updateState('editingTransactionId', null); 
 }
-
-// --- Category Modal Management (New) ---
-export function openCategoryModal() {
-    state.updateState('editingCategoryId', null); // Ensure we are not in edit mode initially
-    resetCategoryForm();
-    renderCategoriesList(); // Render the list inside the modal
-    dom.categoryModal.classList.add('modal-open');
+export function openCategoryModal() { /* ... (no changes from part 9) ... */ 
+    state.updateState('editingCategoryId', null); resetCategoryForm(); renderCategoriesList(); dom.categoryModal.classList.add('modal-open'); dom.categoryNameInput.focus();
 }
-
-export function closeCategoryModal() {
-    dom.categoryModal.classList.remove('modal-open');
-    state.updateState('editingCategoryId', null); // Clear editing state
+export function closeCategoryModal() { /* ... (no changes from part 9) ... */ 
+    dom.categoryModal.classList.remove('modal-open'); state.updateState('editingCategoryId', null); 
 }
-
-/**
- * Renders the list of categories inside the management modal.
- */
-function renderCategoriesList() {
-    const { categories } = state.getState();
-    dom.categoriesList.innerHTML = ''; // Clear list
-
-    // Sort categories, maybe by type then name
-    categories.sort((a, b) => {
-        if (a.type < b.type) return -1;
-        if (a.type > b.type) return 1;
-        return a.name.localeCompare(b.name);
-    });
-
-    if (categories.length === 0) {
-        dom.categoriesList.innerHTML = '<p class="text-sm text-slate-500">No categories defined yet.</p>';
-        return;
-    }
-
+function renderCategoriesList() { /* ... (no changes from part 9) ... */ 
+    const { categories } = state.getState(); dom.categoriesList.innerHTML = '';
+    categories.sort((a,b) => (a.id === 'cat_uncategorized') ? -1 : (b.id === 'cat_uncategorized') ? 1 : (a.type < b.type) ? -1 : (a.type > b.type) ? 1 : a.name.localeCompare(b.name));
+    if (categories.length === 0) { dom.categoriesList.innerHTML = '<p>No categories.</p>'; return; }
     categories.forEach(cat => {
-        const item = document.createElement('div');
-        item.className = 'category-item flex justify-between items-center p-2 border-b border-slate-100';
-
-        const infoSpan = document.createElement('span');
-        infoSpan.className = 'text-sm';
-        infoSpan.textContent = `${cat.name} (${cat.type})`;
-        item.appendChild(infoSpan);
-
-        // Add controls (Edit/Delete), but prevent deleting 'Uncategorized'
+        const item = document.createElement('div'); item.className = 'category-item flex justify-between items-center p-2 border-b border-slate-100 last:border-b-0';
+        const info = document.createElement('span'); info.className = 'text-sm'; info.textContent = `${cat.name} (${cat.type.charAt(0).toUpperCase() + cat.type.slice(1)})`; item.appendChild(info);
         if (cat.id !== 'cat_uncategorized') {
-            const controlsDiv = document.createElement('div');
-            controlsDiv.className = 'flex items-center gap-1.5';
-
-            // Edit Button
-            const editBtn = document.createElement('button');
-            editBtn.className = 'p-1 text-slate-500 hover:text-sky-600 rounded-md hover:bg-sky-100 transition-colors';
-            editBtn.title = `Edit category: ${cat.name}`;
-            editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><line x1="18" x2="22" y1="2" y2="6"/><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"/></svg>`;
-            editBtn.onclick = () => startEditCategory(cat);
-            controlsDiv.appendChild(editBtn);
-
-            // Delete Button
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'p-1 text-slate-500 hover:text-red-600 rounded-md hover:bg-red-100 transition-colors';
-            deleteBtn.title = `Delete category: ${cat.name}`;
-            deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`;
-            deleteBtn.onclick = () => handleDeleteCategory(cat.id, cat.name);
-            controlsDiv.appendChild(deleteBtn);
-            item.appendChild(controlsDiv);
-        }
-
+            const controls = document.createElement('div'); controls.className = 'flex items-center gap-1.5 flex-shrink-0';
+            const editBtn = document.createElement('button'); editBtn.className = 'p-1 text-slate-500 hover:text-sky-600 rounded-md hover:bg-sky-100'; editBtn.title = `Edit: ${cat.name}`; editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><line x1="18" x2="22" y1="2" y2="6"/><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"/></svg>`; editBtn.onclick = () => startEditCategory(cat); controls.appendChild(editBtn);
+            const delBtn = document.createElement('button'); delBtn.className = 'p-1 text-slate-500 hover:text-red-600 rounded-md hover:bg-red-100'; delBtn.title = `Delete: ${cat.name}`; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`; delBtn.onclick = () => handleDeleteCategory(cat.id, cat.name); controls.appendChild(delBtn); item.appendChild(controls);
+        } else { const ph = document.createElement('div'); ph.className = 'w-16'; item.appendChild(ph); }
         dom.categoriesList.appendChild(item);
     });
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-       lucide.createIcons(); 
-    }
+}
+function startEditCategory(category) { /* ... (no changes from part 9) ... */ 
+    state.updateState('editingCategoryId', category.id); dom.categoryIdInput.value = category.id; dom.categoryNameInput.value = category.name; dom.categoryTypeInput.value = category.type; dom.saveCategoryBtnText.textContent = 'Save Changes'; dom.cancelEditCategoryBtn.classList.remove('hidden'); dom.categoryNameInput.focus();
+}
+export function resetCategoryForm() { /* ... (no changes from part 9) ... */ 
+    state.updateState('editingCategoryId', null); dom.categoryForm.reset(); dom.categoryIdInput.value = ''; dom.saveCategoryBtnText.textContent = 'Add Category'; dom.cancelEditCategoryBtn.classList.add('hidden'); 
 }
 
-/**
- * Sets up the category form for editing an existing category.
- * @param {object} category - The category object to edit.
- */
-function startEditCategory(category) {
-    state.updateState('editingCategoryId', category.id);
-    dom.categoryIdInput.value = category.id;
-    dom.categoryNameInput.value = category.name;
-    dom.categoryTypeInput.value = category.type;
-    dom.saveCategoryBtnText.textContent = 'Save Changes';
-    dom.cancelEditCategoryBtn.classList.remove('hidden'); // Show cancel button
-    dom.categoryNameInput.focus();
+// --- Exchange Rate Modal Management ---
+export function openExchangeRatesModal() { /* ... (no changes from part 11a) ... */ 
+    renderExchangeRatesForm(); 
+    dom.exchangeRateModal.classList.add('modal-open');
 }
-
-/**
- * Resets the category form to its default state (for adding).
- */
-function resetCategoryForm() {
-    state.updateState('editingCategoryId', null);
-    dom.categoryForm.reset();
-    dom.categoryIdInput.value = '';
-    dom.saveCategoryBtnText.textContent = 'Add Category';
-    dom.cancelEditCategoryBtn.classList.add('hidden'); // Hide cancel button
+export function closeExchangeRatesModal() { /* ... (no changes from part 11a) ... */ 
+    dom.exchangeRateModal.classList.remove('modal-open');
 }
-
+function renderExchangeRatesForm() { /* ... (no changes from part 11b) ... */ 
+    const { exchangeRates } = state.getState(); const { base, rates } = exchangeRates;
+    dom.rateBaseCurrencySelect.innerHTML = ''; Object.keys(CURRENCY_SYMBOLS).forEach(code => { const opt = document.createElement('option'); opt.value = code; opt.textContent = code; if (code === base) opt.selected = true; dom.rateBaseCurrencySelect.appendChild(opt); });
+    dom.formBaseCurrencyLabel.textContent = base;
+    dom.exchangeRatesListContainer.innerHTML = ''; const allAppCurrencies = new Set(Object.keys(CURRENCY_SYMBOLS)); const displayOrder = Array.from(allAppCurrencies).sort();
+    displayOrder.forEach(code => {
+        const itemDiv = document.createElement('div'); itemDiv.className = 'rate-item grid grid-cols-3 items-center gap-2 py-1';
+        const lbl = document.createElement('label'); lbl.htmlFor = `rate-input-${code}`; lbl.className = 'block text-sm font-medium text-slate-700 col-span-1'; lbl.textContent = `${code}:`; itemDiv.appendChild(lbl);
+        const inp = document.createElement('input'); inp.type = 'number'; inp.id = `rate-input-${code}`; inp.name = code; inp.step = 'any'; inp.min = '0.000001'; inp.className = 'w-full p-2 border border-slate-300 rounded-md shadow-sm col-span-2 focus:ring-sky-500 focus:border-sky-500';
+        inp.value = rates[code] !== undefined ? rates[code] : '';
+        if (code === base) { inp.value = '1'; inp.readOnly = true; inp.classList.add('bg-slate-100', 'cursor-not-allowed'); }
+        itemDiv.appendChild(inp); dom.exchangeRatesListContainer.appendChild(itemDiv);
+    });
+    dom.rateBaseCurrencySelect.onchange = () => { // Dynamic update of label and readonly state
+        const newSelectedBase = dom.rateBaseCurrencySelect.value;
+        dom.formBaseCurrencyLabel.textContent = newSelectedBase;
+        const inputs = dom.exchangeRatesListContainer.querySelectorAll('input[type="number"]');
+        inputs.forEach(inp => {
+            if (inp.name === newSelectedBase) { inp.value = '1'; inp.readOnly = true; inp.classList.add('bg-slate-100', 'cursor-not-allowed'); } 
+            else { inp.readOnly = false; inp.classList.remove('bg-slate-100', 'cursor-not-allowed'); /* Value will be updated on save */ }
+        });
+    };
+}
 
 // --- Form Handlers ---
 export function handleProfileFormSubmit(event) { /* ... (no changes) ... */ 
@@ -318,46 +225,20 @@ export function handleTransactionFormSubmit(event) { /* ... (no changes) ... */
     if (editId) { state.updateTransaction(profileId, editId, data); } else { state.addTransaction(profileId, data); }
     state.saveData(); renderApp(); closeTransactionModal();
 }
-
-/**
- * Handles submission of the category form (add or edit). (New)
- * @param {Event} event - The form submission event.
- */
-export function handleCategoryFormSubmit(event) {
-    event.preventDefault();
-    const name = dom.categoryNameInput.value.trim();
-    const type = dom.categoryTypeInput.value;
-    const editingCategoryId = state.getState().editingCategoryId;
-
-    if (!name || !type) {
-        alert("Please provide both category name and type.");
-        return;
-    }
-
-    let success = false;
-    if (editingCategoryId) {
-        const updatedCategory = state.updateCategory(editingCategoryId, { name, type });
-        success = !!updatedCategory; // Check if update was successful (not null)
-        if (!success) {
-            alert(`Failed to update category. Another category with name "${name}" and type "${type}" might already exist.`);
-        }
-    } else {
-        const newCategory = state.addCategory(name, type);
-        success = !!newCategory; // Check if add was successful (not null)
-        if (!success) {
-            alert(`Failed to add category. A category with name "${name}" and type "${type}" might already exist.`);
-        }
-    }
-
-    if (success) {
-        state.saveData();
-        resetCategoryForm(); // Reset form after successful save/add
-        renderCategoriesList(); // Re-render the list in the modal
-        // No need to call renderApp() unless the category change affects the main view immediately
-        // (e.g., if filters were active). For now, just update the modal list.
-    }
+export function handleCategoryFormSubmit(event) { /* ... (no changes) ... */ 
+    event.preventDefault(); const name = dom.categoryNameInput.value.trim(); const type = dom.categoryTypeInput.value; const id = state.getState().editingCategoryId;
+    if (!name || !type) { alert("Name and type required."); return; }
+    let success = false; let op = '';
+    if (id) { op = 'update'; const updated = state.updateCategory(id, { name, type }); success = !!updated; } 
+    else { op = 'add'; const added = state.addCategory(name, type); success = !!added; }
+    if (success) { state.saveData(); resetCategoryForm(); renderCategoriesList(); } 
+    else { alert(`Failed to ${op} category. Duplicate name/type?`); }
 }
-
+export function handleSaveExchangeRates(event) { /* ... (no changes from part 11b) ... */ 
+    event.preventDefault(); const formData = new FormData(dom.exchangeRateForm); const formRates = {}; let allValid = true; const newBase = dom.rateBaseCurrencySelect.value;
+    for (const [key, val] of formData.entries()) { if (key === 'baseCurrency') continue; const rate = parseFloat(val); if (key === newBase) { formRates[key] = 1; continue; } if (isNaN(rate) || rate <= 0) { alert(`Invalid rate for ${key}`); allValid = false; break; } formRates[key] = rate; }
+    if (allValid) { if (state.updateExchangeRates(newBase, formRates)) { renderApp(); closeExchangeRatesModal(); alert("Rates saved!"); } }
+}
 
 // --- Delete Handlers ---
 function handleDeleteProfile(profileId, profileName) { /* ... (no changes) ... */ 
@@ -372,47 +253,104 @@ function handleDeleteTransaction(profileId, transactionId) { /* ... (no changes)
         else { alert("Failed to delete transaction."); }
     }
 }
-
-/**
- * Handles the UI confirmation and deletion of a category. (New)
- * @param {string} categoryId - The ID of the category to delete.
- * @param {string} categoryName - The name for the confirmation message.
- */
-function handleDeleteCategory(categoryId, categoryName) {
-    if (categoryId === 'cat_uncategorized') {
-        alert("Cannot delete the default 'Uncategorized' category.");
-        return;
-    }
-    if (confirm(`Are you sure you want to delete the category "${categoryName}"? Any transactions using this category will be set to 'Uncategorized'.`)) {
-        const success = state.deleteCategory(categoryId);
-        if (success) {
-            state.saveData();
-            renderCategoriesList(); // Update list in modal
-            // Potentially call renderApp() if category deletion needs to refresh main transaction list immediately
-            renderApp(); // Refresh main view to show 'Uncategorized' for reassigned transactions
-            alert(`Category "${categoryName}" deleted.`);
-        } else {
-            alert("Failed to delete category. Please try again.");
-        }
+function handleDeleteCategory(categoryId, categoryName) { /* ... (no changes) ... */ 
+    if (categoryId === 'cat_uncategorized') { alert("Cannot delete 'Uncategorized'."); return; }
+    if (confirm(`Delete category "${categoryName}"? Transactions will be 'Uncategorized'.`)) {
+        if (state.deleteCategory(categoryId)) { state.saveData(); renderCategoriesList(); renderApp(); alert(`Category "${categoryName}" deleted.`); } 
+        else { alert("Failed to delete category."); }
     }
 }
 
 // --- Import/Export Handlers ---
-export function handleImportData(event) { /* ... (no changes) ... */ 
+export function handleImportData(event) { /* Full App Data Import - no changes */ 
     const file = event.target.files[0]; if (!file) return; if (file.type !== "application/json") { alert("Invalid file type."); dom.importFile.value = null; return; }
     const reader = new FileReader();
     reader.onload = (e) => {
         try { const data = JSON.parse(e.target.result);
-            if (data && data.profiles && data.activeProfileId && data.globalDefaultCurrency) {
-                if (confirm("Overwrite current data?")) { if (state.replaceState(data)) { state.saveData(); renderApp(); alert("Import successful!"); } else { alert("Import failed: Invalid data structure."); } }
-            } else { alert("Invalid JSON structure."); }
+            if (data && data.profiles && data.activeProfileId && data.displayCurrency) { 
+                if (confirm("Overwrite current app data?")) { if (state.replaceState(data)) { state.saveData(); renderApp(); alert("App data import successful!"); } else { alert("Import failed: Invalid data structure."); } }
+            } else { alert("Invalid JSON structure for app data."); }
         } catch (err) { console.error(err); alert("Error parsing import file."); } 
         finally { dom.importFile.value = null; }
     }; reader.onerror = () => { alert("Error reading file."); dom.importFile.value = null; }; reader.readAsText(file);
 }
-export function handleExportData() { /* ... (no changes) ... */ 
-    const data = state.getState(); if (data.profiles.length === 0 && !confirm("No data. Export empty file?")) return;
+export function handleExportData() { /* Full App Data Export - no changes */ 
+    const data = state.getState(); 
+    if (data.profiles.length === 0 && !confirm("No data. Export empty file?")) return;
     const json = JSON.stringify(data, null, 2); const blob = new Blob([json], { type: 'application/json' }); const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; const ts = new Date().toISOString().slice(0, 19).replace(/:/g, '-').replace('T', '_'); a.download = `money_tracker_data_${ts}.json`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); alert("Export successful!");
+    const a = document.createElement('a'); a.href = url; const ts = new Date().toISOString().slice(0, 19).replace(/:/g, '-').replace('T', '_'); a.download = `money_tracker_app_data_${ts}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); alert("App data export successful!");
+}
+
+/**
+ * Handles importing a dedicated exchange rates JSON file. (New)
+ * @param {Event} event - The file input change event from importRatesFile.
+ */
+export function handleImportExchangeRatesFile(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        console.log("No file selected for importing rates.");
+        return;
+    }
+    if (file.type !== "application/json") {
+        alert("Invalid file type. Please select a JSON file for exchange rates.");
+        dom.importRatesFile.value = null; // Reset file input
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const importedRatesData = JSON.parse(e.target.result);
+            // Validate the structure of importedRatesData
+            if (importedRatesData && importedRatesData.base && importedRatesData.rates && 
+                typeof importedRatesData.rates === 'object' && importedRatesData.lastUpdated) {
+                
+                if (confirm(`Importing this rates file will overwrite your current exchange rates. Base: ${importedRatesData.base}. Are you sure?`)) {
+                    const success = state.replaceExchangeRates(importedRatesData);
+                    if (success) {
+                        // state.saveData() is called within replaceExchangeRates
+                        renderApp(); // Re-render to update rate info and dashboard
+                        closeExchangeRatesModal(); // Close modal after successful import
+                        alert("Exchange rates imported successfully!");
+                    } else {
+                        alert("Failed to import exchange rates. The file structure or values might be incorrect.");
+                    }
+                }
+            } else {
+                alert("Invalid JSON structure for exchange rates file. Expected { base: 'CUR', rates: {...}, lastUpdated: 'timestamp' }.");
+            }
+        } catch (error) {
+            console.error("Error parsing JSON from imported rates file:", error);
+            alert("Error reading or parsing the rates import file. Please ensure it's a valid JSON.");
+        } finally {
+            dom.importRatesFile.value = null; // Reset file input
+        }
+    };
+    reader.onerror = () => {
+        alert("Error reading the rates file.");
+        dom.importRatesFile.value = null;
+    };
+    reader.readAsText(file);
+}
+
+/**
+ * Handles exporting the current exchange rates to a JSON file. (New)
+ */
+export function handleExportExchangeRatesFile() {
+    const ratesData = state.getExchangeRatesState(); // Get only the exchange rates part of state
+    
+    const jsonData = JSON.stringify(ratesData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
+    a.download = `money_tracker_exchange_rates_${ratesData.base}_${timestamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    console.log("Exchange rates exported successfully.");
+    alert("Exchange rates exported successfully! Check your downloads folder.");
 }
