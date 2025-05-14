@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" data-theme="light"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Money Tracker Pro</title>
@@ -15,10 +14,18 @@
                     },
                 }
             }
+
+            
+            // We might add darkMode: 'class' or darkMode: ['class', '[data-theme="dark"]'] here later
+            // if we want to leverage Tailwind's dark mode variants, but for now, CSS variables will do.
+            
         }
+
+        
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* CSS variables will be defined here later */
         /* Styles remain the same as previous version... */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
@@ -40,52 +47,338 @@
         .transaction-item button, .category-item button, .profile-item button { min-width: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center;}
         .transaction-reimbursed { text-decoration: line-through; color: #64748b; /* slate-500 */ }
         .transaction-reimbursed .font-semibold { color: #16a34a !important; /* green-600 for reimbursed amount */ text-decoration: none !important;}
+
+        /* Basic Theme Variables (will be expanded) */
+        :root {
+            --bg-primary: theme('colors.slate.100');
+            --bg-secondary: theme('colors.white');
+            --text-primary: theme('colors.slate.800');
+            --text-secondary: theme('colors.slate.500');
+            --text-accent: theme('colors.sky.600');
+            --border-primary: theme('colors.slate.300');
+            --border-secondary: theme('colors.slate.200');
+            --modal-bg: theme('colors.white');
+            --input-bg: theme('colors.white');
+            --input-border: theme('colors.slate.300');
+            --button-primary-bg: theme('colors.sky.500');
+            --button-primary-text: theme('colors.white');
+            --button-secondary-bg: theme('colors.slate.200');
+            --button-secondary-text: theme('colors.slate.700');
+            /* ... more variables as needed */
+        }
+        /* --- Dark Theme --- */
+        [data-theme="dark"] {
+            --bg-primary: theme('colors.slate.900');
+            --bg-secondary: theme('colors.slate.800');
+            --text-primary: theme('colors.slate.200');
+            --text-secondary: theme('colors.slate.400');
+            --text-accent: theme('colors.sky.400');
+            --border-primary: theme('colors.slate.700');
+            --border-secondary: theme('colors.slate.700');
+            --modal-bg: theme('colors.slate.800');
+            --input-bg: theme('colors.slate.700');
+            --input-border: theme('colors.slate.600');
+            --button-primary-bg: theme('colors.sky.600');
+            --button-primary-text: theme('colors.white');
+            --button-secondary-bg: theme('colors.slate.700');
+            --button-secondary-text: theme('colors.slate.200');
+
+            /* Specific overrides for dark theme */
+            --profile-item-hover-bg: theme('colors.slate.700');
+            --profile-item-active-bg: theme('colors.slate.700');
+            --profile-item-active-border: theme('colors.sky.500');
+            --profile-item-active-text: theme('colors.sky.300');
+            --transaction-item-hover-bg: theme('colors.slate.700');
+            --link-text: theme('colors.sky.400');
+            --link-text-hover: theme('colors.sky.300');
+            --icon-color: theme('colors.slate.400');
+            --icon-hover-color: theme('colors.sky.400');
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-track { background: #2d3748; /* A darker track for dark mode */ }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #4a5568; /* A mid-dark thumb */ }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #718096; }
+
+        [data-theme="dark"] .profile-item:hover { background-color: var(--profile-item-hover-bg); border-left-color: var(--text-accent); }
+        [data-theme="dark"] .profile-item.active { background-color: var(--profile-item-active-bg); border-left-color: var(--profile-item-active-border); }
+        [data-theme="dark"] .profile-item.active .profile-name { color: var(--profile-item-active-text); }
+        [data-theme="dark"] .transaction-item:hover,
+        [data-theme="dark"] .category-item:hover,
+        [data-theme="dark"] .rate-item:hover { background-color: var(--transaction-item-hover-bg); }
+
+        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+         [data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+        [data-theme="dark"] select {
+            /* Basic styling for select in dark mode if default is hard to see */
+            /* background-image to change arrow color may be needed for full control */
+        }
+        [data-theme="dark"] .transaction-reimbursed {
+            color: theme('colors.slate.500'); /* Slightly lighter for dark mode */
+        }
+        [data-theme="dark"] .transaction-reimbursed .font-semibold { /* Amount text */
+            color: theme('colors.green.400') !important;
+        }
+
+ /* Dark Theme Variables */
+        [data-theme="dark"] {
+            --bg-primary: theme('colors.slate.900');
+            --bg-secondary: theme('colors.slate.800');
+            --bg-tertiary: theme('colors.slate.700');
+
+            --text-primary: theme('colors.slate.100');
+            --text-secondary: theme('colors.slate.400');
+            --text-accent: theme('colors.sky.400');
+            --text-on-primary-button: theme('colors.white');
+            --text-on-secondary-button: theme('colors.slate.100');
+            --text-danger: theme('colors.red.400');
+            --text-success: theme('colors.green.400');
+
+            --border-primary: theme('colors.slate.600');
+            --border-secondary: theme('colors.slate.700');
+            --border-focus: theme('colors.sky.500');
+
+            --modal-bg: theme('colors.slate.800');
+            --modal-overlay-bg: rgba(0,0,0,0.7);
+
+            --input-bg: theme('colors.slate.700');
+            --input-border: theme('colors.slate.600');
+            --input-text: theme('colors.slate.100');
+            --input-placeholder-text: theme('colors.slate.500');
+
+            --button-primary-bg: theme('colors.sky.600');
+            --button-primary-bg-hover: theme('colors.sky.500');
+            --button-secondary-bg: theme('colors.slate.700');
+            --button-secondary-bg-hover: theme('colors.slate.600');
+            --button-danger-bg: theme('colors.red.600');
+            --button-danger-bg-hover: theme('colors.red.500');
+            --button-success-bg: theme('colors.green.600');
+            --button-success-bg-hover: theme('colors.green.500');
+
+            --profile-item-hover-bg: theme('colors.slate.700');
+            --profile-item-active-bg: theme('colors.slate.700'); /* Consider a slight diff from hover if needed */
+            --profile-item-active-border: theme('colors.sky.500');
+            --profile-item-active-text: theme('colors.sky.300');
+
+            --transaction-item-hover-bg: theme('colors.slate.700'); /* Darker hover */
+            --reimbursed-text-color: theme('colors.slate.400');
+            --reimbursed-amount-color: theme('colors.green.400');
+
+            --scrollbar-track-bg: theme('colors.slate.700');
+            --scrollbar-thumb-bg: theme('colors.slate.500');
+            --scrollbar-thumb-hover-bg: theme('colors.slate.400');
+        }
+
+        /* Sepia Theme Variables */
+        [data-theme="sepia"] {
+            --bg-primary: #f4ecd8;
+            --bg-secondary: #e9e0cf;
+            --bg-tertiary: #e0d8c7;
+
+            --text-primary: #5b4636;
+            --text-secondary: #7d6b5a;
+            --text-accent: #8c5a32;
+            --text-on-primary-button: #f4ecd8;
+            --text-on-secondary-button: #5b4636;
+            --text-danger: #a52a2a; /* Brown for danger */
+            --text-success: #556b2f; /* Dark Olive Green for success */
+
+            --border-primary: #d3c7b3;
+            --border-secondary: #c0b5a0;
+            --border-focus: #8c5a32;
+
+            --modal-bg: #e9e0cf;
+            --modal-overlay-bg: rgba(91,70,54,0.5); /* Brownish overlay */
+
+            --input-bg: #fdf6e3;
+            --input-border: #d3c7b3;
+            --input-text: #5b4636;
+            --input-placeholder-text: #8d7e6f;
+
+            --button-primary-bg: #8c5a32;
+            --button-primary-bg-hover: #7c4a22;
+            --button-secondary-bg: #d3c7b3;
+            --button-secondary-bg-hover: #c0b5a0;
+            --button-danger-bg: #b22222; /* Firebrick */
+            --button-danger-bg-hover: #8b0000; /* DarkRed */
+            --button-success-bg: #6b8e23; /* OliveDrab */
+            --button-success-bg-hover: #556b2f; /* DarkOliveGreen */
+
+
+            --profile-item-hover-bg: #e0d8c7;
+            --profile-item-active-bg: #d8cebc;
+            --profile-item-active-border: #8c5a32;
+            --profile-item-active-text: #7c4a22;
+
+            --transaction-item-hover-bg: #e0d8c7;
+            --reimbursed-text-color: #8f7a66;
+            --reimbursed-amount-color: #556b2f;
+
+            --scrollbar-track-bg: #e0d8c7;
+            --scrollbar-thumb-bg: #bcae99;
+            --scrollbar-thumb-hover-bg: #a89c88;
+        }
+
+        /* Base HTML and Body styles */
+        html {
+            font-family: theme('fontFamily.sans');
+        }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.2s ease-out, color 0.2s ease-out;
+        }
+
+
+        [data-theme="sepia"] ::-webkit-scrollbar-track { background: #e0d8c7; }
+        [data-theme="sepia"] ::-webkit-scrollbar-thumb { background: #bcae99; }
+        [data-theme="sepia"] ::-webkit-scrollbar-thumb:hover { background: #a89c88; }
+
+        [data-theme="sepia"] .profile-item:hover { background-color: var(--profile-item-hover-bg); border-left-color: var(--text-accent); }
+        [data-theme="sepia"] .profile-item.active { background-color: var(--profile-item-active-bg); border-left-color: var(--profile-item-active-border); }
+        [data-theme="sepia"] .profile-item.active .profile-name { color: var(--profile-item-active-text); }
+        [data-theme="sepia"] .transaction-item:hover,
+        [data-theme="sepia"] .category-item:hover,
+        [data-theme="sepia"] .rate-item:hover { background-color: var(--transaction-item-hover-bg); }
+
+        [data-theme="sepia"] input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: contrast(0.5) sepia(0.3); /* Adjust for better visibility on sepia */
+        }
+        [data-theme="sepia"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: contrast(0.5) sepia(0.3);
+        }
+        /* Transaction specific colors for sepia */
+        [data-theme="sepia"] .text-green-600 { color: #556b2f !important; /* Dark Olive Green */ }
+        [data-theme="sepia"] .text-red-600 { color: #a52a2a !important; /* Brown */ }
+        [data-theme="sepia"] .text-sky-600 { color: var(--text-accent) !important; }
+
+        [data-theme="sepia"] .bg-green-500 { background-color: #6b8e23 !important; /* OliveDrab */ color: var(--button-primary-text) !important; }
+        [data-theme="sepia"] .bg-green-500:hover { background-color: #556b2f !important; }
+        [data-theme="sepia"] .bg-red-500 { background-color: #b22222 !important; /* Firebrick */ color: var(--button-primary-text) !important; }
+        [data-theme="sepia"] .bg-red-500:hover { background-color: #8b0000 !important; /* DarkRed */ }
+        [data-theme="sepia"] .bg-sky-500 { background-color: var(--button-primary-bg) !important; }
+        [data-theme="sepia"] .bg-sky-500:hover { background-color: #7c4a22 !important; }
+
+        [data-theme="sepia"] .transaction-reimbursed {
+            color: #8f7a66; /* Lighter brown for strikethrough */
+        }
+        [data-theme="sepia"] .transaction-reimbursed .font-semibold { /* Amount text */
+            color: #556b2f !important; /* Dark Olive Green for reimbursed amount */
+        }
+
+        /* Shared modal close button hover for dark/sepia */
+        [data-theme="dark"] .modal-close-btn:hover,
+        [data-theme="sepia"] .modal-close-btn:hover {
+            background-color: var(--border-primary); /* Or a slightly lighter shade of the modal bg */
+        }
+
+        /* Apply variables to elements more globally */
+        /* Sidebar specific */
+        aside { background-color: var(--bg-secondary) !important; } /* Ensure this overrides Tailwind utility */
+        aside h1, aside h2, aside label, aside p, aside span, aside button, aside select { color: var(--text-primary); }
+        aside #profilesListEl .profile-item { background-color: transparent; } /* Default state */
+        aside #profilesListEl .profile-item .profile-name { color: var(--text-primary); }
+        aside #profilesListEl .profile-item.active { background-color: var(--profile-item-active-bg); border-left-color: var(--profile-item-active-border); }
+        aside #profilesListEl .profile-item.active .profile-name { color: var(--profile-item-active-text); }
+        aside #profilesListEl .profile-item:hover { background-color: var(--profile-item-hover-bg); }
+        aside select, aside input[type="number"] { background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary); }
+        aside button:not(#addProfileBtn):not(#viewAllProfilesBtn):not(#importDataBtn):not(#exportDataBtn) { /* general secondary buttons */
+            background-color: var(--button-secondary-bg);
+            color: var(--button-secondary-text);
+        }
+        aside button:hover:not(#addProfileBtn):not(#viewAllProfilesBtn):not(#importDataBtn):not(#exportDataBtn) {
+             filter: brightness(95%); /* Slight darken on hover */
+        }
+        aside #addProfileBtn { color: var(--text-accent); } /* Keep this one special */
+        aside #viewAllProfilesBtn { background-color: var(--button-primary-bg); color: var(--button-primary-text); }
+         aside #viewAllProfilesBtn:hover { filter: brightness(90%);}
+
+        /* Main content */
+        main { background-color: var(--bg-primary) !important; }
+        main h2, main h3, main p, main label, main span { color: var(--text-primary); }
+        main #profileCurrencyInfoDisplay, main #activeDateRangeDisplay { color: var(--text-accent); }
+        main #projectionDateInput { background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary); }
+        main #summarySection > div { background-color: var(--bg-secondary); }
+        main #transactionsListContainer { background-color: var(--bg-secondary); }
+        main #transactionsListEl { border-color: var(--border-secondary); }
+        main #noTransactionsMessage { color: var(--text-secondary); }
+
+        /* Modals */
+        .modal-content { background-color: var(--modal-bg); color: var(--text-primary); }
+        .modal-content h3, .modal-content h4, .modal-content label, .modal-content p { color: var(--text-primary); }
+        .modal-content input, .modal-content select { background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary); }
+        .modal-content .modal-close-btn { color: var(--text-secondary); }
+        .modal-content form { border-color: var(--border-secondary); }
+        .modal-content button[type="submit"] { background-color: var(--button-primary-bg); color: var(--button-primary-text); }
+         .modal-content button[type="submit"]:hover {filter: brightness(90%);}
+        .modal-content button[type="button"]:not(.modal-close-btn) { /* Cancel buttons */
+            /* background-color: var(--button-secondary-bg); */ /* Making them more subtle */
+            color: var(--text-secondary);
+        }
+         .modal-content button[type="button"]:not(.modal-close-btn):hover {
+            background-color: var(--button-secondary-bg);
+         }
+
+
+        /* Styles applied to the body based on data-theme */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* You will add more theme-specific CSS rules here later */
     </style>
 </head>
-<body class="bg-slate-100 font-sans antialiased">
-    <div class="flex flex-col md:flex-row min-h-screen">
-        <aside class="w-full md:w-72 bg-white shadow-lg p-6 space-y-6 flex flex-col">
+<body class="font-sans antialiased"> <div class="flex flex-col md:flex-row min-h-screen">
+        <aside class="w-full md:w-72 bg-secondary shadow-lg p-6 space-y-6 flex flex-col" style="background-color: var(--bg-secondary);">
             <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-sky-600">MoneyTrack</h1>
+                <h1 class="text-2xl font-bold" style="color: var(--text-accent);">MoneyTrack</h1>
             </div>
             <div class="flex-grow">
                 <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-lg font-semibold text-slate-700">Profiles</h2>
+                    <h2 class="text-lg font-semibold" style="color: var(--text-primary);">Profiles</h2>
                     <button id="addProfileBtn" title="Add New Profile" class="p-2 rounded-md hover:bg-sky-100 text-sky-600 active:bg-sky-200 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
                     </button>
                 </div>
-                <div id="profilesListEl" class="space-y-1.5 max-h-60 md:max-h-[calc(100vh-600px)] overflow-y-auto pr-1"></div>
+                <div id="profilesListEl" class="space-y-1.5 max-h-72 md:max-h-[calc(100vh-520px)] overflow-y-auto pr-1"></div>
                 <button id="viewAllProfilesBtn" class="mt-4 w-full flex items-center justify-center gap-2 text-sm py-2.5 px-4 rounded-lg bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                     View All Profiles
                 </button>
             </div>
-            <div class="space-y-4 pt-4 border-t border-slate-200">
-                <div>
-                    <h2 class="text-md font-semibold text-slate-700 mb-2">App Settings</h2>
-                    <label for="appDisplayCurrencySelect" class="block text-xs font-medium text-slate-600 mb-1">Display Currency (for All Profiles & New):</label>
-                    <select id="appDisplayCurrencySelect" name="currency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm">
-                        <option value="IDR">IDR - Indonesian Rupiah</option>
-                        <option value="USD">USD - US Dollar</option>
-                        <option value="JPY">JPY - Japanese Yen</option>
-                        <option value="EUR">EUR - Euro</option>
-                        <option value="SGD">SGD - Singapore Dollar</option>
-                    </select>
-                    <button id="manageCategoriesBtn" class="mt-3 w-full flex items-center justify-center gap-2 text-sm py-2 px-4 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 active:bg-slate-400 transition-colors shadow-sm">
+            <div class="space-y-4 pt-4 border-t" style="border-color: var(--border-secondary);">
+                 <div> <h2 class="text-md font-semibold mb-2" style="color: var(--text-primary);">App Settings</h2>
+                    <div class="mb-3">
+                        <label for="appDisplayCurrencySelect" class="block text-xs font-medium mb-1" style="color: var(--text-secondary);">Display Currency (All & New):</label>
+                        <select id="appDisplayCurrencySelect" name="currency" class="w-full p-2 border rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
+                            <option value="IDR">IDR - Indonesian Rupiah</option>
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="SGD">SGD - Singapore Dollar</option>
+                        </select>
+                    </div>
+                    <div class="mb-3"> <label for="themeSelector" class="block text-xs font-medium mb-1" style="color: var(--text-secondary);">App Theme:</label>
+                        <select id="themeSelector" name="theme" class="w-full p-2 border rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"></select>
+                    </div>
+                    <button id="manageCategoriesBtn" class="mt-3 w-full flex items-center justify-center gap-2 text-sm py-2 px-4 rounded-lg transition-colors shadow-sm" style="background-color: var(--button-secondary-bg); color: var(--button-secondary-text);">
                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-plus"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/></svg>
                         Manage Categories
                     </button>
                 </div>
-                <div id="exchangeRateInfoSection" class="pt-3 border-t border-slate-200">
-                    <h2 class="text-md font-semibold text-slate-700 mb-1">Exchange Rates</h2>
-                    <p class="text-xs text-slate-600">Base: <span id="exchangeRateBaseDisplay" class="font-medium">USD</span></p>
-                    <p class="text-xs text-slate-600">Last Updated: <span id="exchangeRateTimestampDisplay" class="font-medium">N/A</span></p>
-                    <button id="manageExchangeRatesBtn" class="mt-2 w-full text-xs py-1.5 px-3 rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300 active:bg-slate-400 transition-colors shadow-sm">Manage Rates</button>
+                <div id="exchangeRateInfoSection" class="pt-3 border-t" style="border-color: var(--border-secondary);">
+                    <h2 class="text-md font-semibold mb-1" style="color: var(--text-primary);">Exchange Rates</h2>
+                    <p class="text-xs mb-0.5" style="color: var(--text-secondary);">Base: <span id="exchangeRateBaseDisplay" class="font-medium">USD</span></p>
+                    <p class="text-xs" style="color: var(--text-secondary);">Last Updated: <span id="exchangeRateTimestampDisplay" class="font-medium">N/A</span></p>
+                    <button id="manageExchangeRatesBtn" class="mt-2 w-full text-xs py-1.5 px-3 rounded-md shadow-sm" style="background-color: var(--button-secondary-bg); color: var(--button-secondary-text);">Manage Rates</button>
                 </div>
 
-                <div class="space-y-2 pt-3 border-t border-slate-200">
-                     <h2 class="text-md font-semibold text-slate-700 mb-2">Data Management</h2>
+                <div class="space-y-2 pt-3 border-t" style="border-color: var(--border-secondary);">
+                     <h2 class="text-md font-semibold mb-2" style="color: var(--text-primary);">Data Management</h2>
                     <button id="importDataBtn" class="w-full flex items-center justify-center gap-2 text-sm py-2 px-4 rounded-lg bg-slate-600 text-white hover:bg-slate-700 active:bg-slate-800 transition-colors shadow-sm">
                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         Import App Data
@@ -99,20 +392,19 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-6 md:p-8 bg-slate-50">
-            <header class="mb-6">
+        <main class="flex-1 p-6 md:p-8" style="background-color: var(--bg-primary);"> <header class="mb-6">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                     <div>
-                        <h2 id="currentProfileNameDisplay" class="text-3xl font-bold text-slate-800">Dashboard</h2>
-                        <p id="profileCurrencyInfoDisplay" class="text-sm text-slate-500">Select a profile or view all.</p>
-                        <p id="activeDateRangeDisplay" class="text-xs text-sky-700 font-medium mt-1"></p>
+                        <h2 id="currentProfileNameDisplay" class="text-3xl font-bold" style="color: var(--text-primary);">Dashboard</h2>
+                        <p id="profileCurrencyInfoDisplay" class="text-sm" style="color: var(--text-secondary);">Select a profile or view all.</p>
+                        <p id="activeDateRangeDisplay" class="text-xs font-medium mt-1" style="color: var(--text-accent);"></p>
                     </div>
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                         <div class="flex items-center gap-2">
-                            <label for="projectionDateInput" class="text-sm font-medium text-slate-600 whitespace-nowrap">Preview Until:</label>
-                            <input type="date" id="projectionDateInput" name="projectionDate" class="p-2 border border-slate-300 rounded-md shadow-sm text-sm focus:ring-sky-500 focus:border-sky-500">
+                            <label for="projectionDateInput" class="text-sm font-medium whitespace-nowrap" style="color: var(--text-secondary);">Preview Until:</label>
+                            <input type="date" id="projectionDateInput" name="projectionDate" class="p-2 border rounded-md shadow-sm text-sm focus:ring-sky-500 focus:border-sky-500" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
                         </div>
-                        <button id="resetProjectionDateBtn" title="Show all dates" class="p-2 rounded-md hover:bg-slate-200 text-slate-600 active:bg-slate-300 transition-colors">
+                        <button id="resetProjectionDateBtn" title="Show all dates" class="p-2 rounded-md hover:bg-slate-200 active:bg-slate-300 transition-colors" style="color: var(--text-secondary);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-x-2"><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m17 17 4 4"/><path d="m21 17-4 4"/></svg>
                         </button>
                     </div>
@@ -120,19 +412,19 @@
             </header>
 
             <section id="summarySection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-green-600 mb-2 icon-text-align"> <svg data-lucide="arrow-up-circle" width="24" height="24"><use xlink:href="#lucide-arrow-up-circle"/></svg> Total Income </h3> <p id="totalIncomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
-                <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-red-600 mb-2 icon-text-align"> <svg data-lucide="arrow-down-circle" width="24" height="24"><use xlink:href="#lucide-arrow-down-circle"/></svg> Total Outcome </h3> <p id="totalOutcomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
-                <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-sky-600 mb-2 icon-text-align"> <svg data-lucide="landmark" width="24" height="24"><use xlink:href="#lucide-landmark"/></svg> Net Balance </h3> <p id="netBalanceDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
+                <div class="p-6 rounded-xl shadow-md" style="background-color: var(--bg-secondary);"> <h3 class="text-lg font-semibold text-green-600 mb-2 icon-text-align"> <svg data-lucide="arrow-up-circle" width="24" height="24"><use xlink:href="#lucide-arrow-up-circle"/></svg> Total Income </h3> <p id="totalIncomeDisplay" class="text-3xl font-bold" style="color: var(--text-primary);">Rp0</p> </div>
+                <div class="p-6 rounded-xl shadow-md" style="background-color: var(--bg-secondary);"> <h3 class="text-lg font-semibold text-red-600 mb-2 icon-text-align"> <svg data-lucide="arrow-down-circle" width="24" height="24"><use xlink:href="#lucide-arrow-down-circle"/></svg> Total Outcome </h3> <p id="totalOutcomeDisplay" class="text-3xl font-bold" style="color: var(--text-primary);">Rp0</p> </div>
+                <div class="p-6 rounded-xl shadow-md" style="background-color: var(--bg-secondary);"> <h3 class="text-lg font-semibold text-sky-600 mb-2 icon-text-align"> <svg data-lucide="landmark" width="24" height="24"><use xlink:href="#lucide-landmark"/></svg> Net Balance </h3> <p id="netBalanceDisplay" class="text-3xl font-bold" style="color: var(--text-primary);">Rp0</p> </div>
             </section>
             <section class="mb-8 flex flex-col sm:flex-row gap-4">
                 <button id="addIncomeBtn" class="flex-1 icon-text-align justify-center py-3 px-6 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 active:bg-green-700 transition-colors shadow-sm"> <svg data-lucide="plus" width="20" height="20"><use xlink:href="#lucide-plus"/></svg> Add Income </button>
                 <button id="addOutcomeBtn" class="flex-1 icon-text-align justify-center py-3 px-6 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 active:bg-red-700 transition-colors shadow-sm"> <svg data-lucide="minus" width="20" height="20"><use xlink:href="#lucide-minus"/></svg> Add Outcome </button>
             </section>
             <section id="transactionsSection">
-                <h3 class="text-2xl font-semibold text-slate-700 mb-4">Recent Transactions</h3>
-                <div id="transactionsListContainer" class="bg-white p-2 rounded-xl shadow">
-                    <div id="transactionsListEl" class="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
-                        <div id="noTransactionsMessage" class="p-4 text-center text-slate-500"> Select a profile to see transactions or add a new one. </div>
+                <h3 class="text-2xl font-semibold mb-4" style="color: var(--text-primary);">Recent Transactions</h3>
+                <div id="transactionsListContainer" class="p-2 rounded-xl shadow" style="background-color: var(--bg-secondary);">
+                    <div id="transactionsListEl" class="divide-y max-h-[500px] overflow-y-auto" style="border-color: var(--border-secondary);">
+                        <div id="noTransactionsMessage" class="p-4 text-center" style="color: var(--text-secondary);"> Select a profile to see transactions or add a new one. </div>
                     </div>
                 </div>
             </section>
@@ -140,113 +432,134 @@
     </div>
 
     <div id="profileModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="background-color: var(--modal-bg);">
             <div class="flex justify-between items-center mb-6">
-                <h3 id="profileModalTitle" class="text-xl font-semibold text-slate-700"></h3>
-                <button id="closeProfileModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button>
+                <h3 id="profileModalTitle" class="text-xl font-semibold" style="color: var(--text-primary);"></h3>
+                <button id="closeProfileModalBtn" title="Close" class="p-1.5 rounded-full modal-close-btn" style="color: var(--text-secondary);"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button>
             </div>
             <form id="profileForm">
                 <input type="hidden" id="profileIdInput">
                 <div class="mb-4">
-                    <label for="profileNameInput" class="block text-sm font-medium text-slate-600 mb-1">Profile Name</label>
-                    <input type="text" id="profileNameInput" name="profileName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                    <label for="profileNameInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Profile Name</label>
+                    <input type="text" id="profileNameInput" name="profileName" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label for="profileCurrencyInput" class="block text-sm font-medium text-slate-600 mb-1">Currency</label>
-                        <select id="profileCurrencyInput" name="profileCurrency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+                        <label for="profileCurrencyInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Currency</label>
+                        <select id="profileCurrencyInput" name="profileCurrency" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
                             <option value="IDR">IDR</option> <option value="USD">USD</option> <option value="JPY">JPY</option> <option value="EUR">EUR</option> <option value="SGD">SGD</option>
                         </select>
                     </div>
                     <div>
-                        <label for="profileFinancialMonthStartDayInput" class="block text-sm font-medium text-slate-600 mb-1">Financial Month Starts On (Day)</label>
-                        <input type="number" id="profileFinancialMonthStartDayInput" name="profileFinancialMonthStartDay" min="1" max="31" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
-                        <p class="text-xs text-slate-500 mt-1">Day of the month (1-31) your financial cycle begins.</p>
+                        <label for="profileFinancialMonthStartDayInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Financial Month Starts On (Day)</label>
+                        <input type="number" id="profileFinancialMonthStartDayInput" name="profileFinancialMonthStartDay" min="1" max="31" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required>
+                        <p class="text-xs mt-1" style="color: var(--text-secondary);">Day of the month (1-31) your financial cycle begins.</p>
                     </div>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelProfileModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button>
-                    <button type="submit" id="saveProfileBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button>
+                    <button type="button" id="cancelProfileModalBtn" class="py-2 px-4 rounded-md hover:bg-slate-100" style="color: var(--text-secondary); background-color: transparent;">Cancel</button>
+                    <button type="submit" id="saveProfileBtn" class="py-2 px-4 rounded-md" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
     <div id="transactionModal" class="modal">
-        <div class="modal-content">
+         <div class="modal-content" style="background-color: var(--modal-bg);">
             <div class="flex justify-between items-center mb-6">
-                <h3 id="transactionModalTitle" class="text-xl font-semibold text-slate-700"></h3>
-                <button id="closeTransactionModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button>
+                <h3 id="transactionModalTitle" class="text-xl font-semibold" style="color: var(--text-primary);"></h3>
+                <button id="closeTransactionModalBtn" title="Close" class="p-1.5 rounded-full modal-close-btn" style="color: var(--text-secondary);"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button>
             </div>
             <form id="transactionForm">
                 <input type="hidden" id="transactionIdInput">
                 <input type="hidden" id="transactionTypeInput">
                 <div class="mb-4">
-                    <label for="transactionDescriptionInput" class="block text-sm font-medium text-slate-600 mb-1">Description</label>
-                    <input type="text" id="transactionDescriptionInput" name="description" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                    <label for="transactionDescriptionInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Description</label>
+                    <input type="text" id="transactionDescriptionInput" name="description" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="transactionAmountInput" class="block text-sm font-medium text-slate-600 mb-1">Amount</label>
-                        <input type="number" id="transactionAmountInput" name="amount" step="any" min="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                        <label for="transactionAmountInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Amount</label>
+                        <input type="number" id="transactionAmountInput" name="amount" step="any" min="0.01" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required>
                     </div>
                     <div>
-                        <label for="transactionCategoryInput" class="block text-sm font-medium text-slate-600 mb-1">Category</label>
-                        <select id="transactionCategoryInput" name="category" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> <option value="">-- Select --</option> </select>
+                        <label for="transactionCategoryInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Category</label>
+                        <select id="transactionCategoryInput" name="category" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required> <option value="">-- Select --</option> </select>
                     </div>
                 </div>
-                <div class="mb-4"> <label for="transactionDateInput" class="block text-sm font-medium text-slate-600 mb-1">Date & Time</label>
-                    <input type="datetime-local" id="transactionDateInput" name="date" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                <div class="mb-4">
+                    <label for="transactionDateInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Date & Time</label>
+                    <input type="datetime-local" id="transactionDateInput" name="date" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required>
                 </div>
-                <div id="reimbursementSection" class="mb-6 hidden"> <label for="transactionIsReimbursedInput" class="flex items-center gap-2 text-sm font-medium text-slate-600">
-                        <input type="checkbox" id="transactionIsReimbursedInput" name="isReimbursed" class="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                <div id="reimbursementSection" class="mb-6 hidden">
+                    <label for="transactionIsReimbursedInput" class="flex items-center gap-2 text-sm font-medium" style="color: var(--text-secondary);">
+                        <input type="checkbox" id="transactionIsReimbursedInput" name="isReimbursed" class="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500" style="border-color: var(--input-border);">
                         Is this transaction reimbursed?
                     </label>
-                    <p class="text-xs text-slate-500 mt-1">If checked, this outcome will be treated as effectively an income (or cancel out the expense) in summaries.</p>
+                    <p class="text-xs mt-1" style="color: var(--text-secondary);">If checked, this outcome will be treated as effectively an income in summaries.</p>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelTransactionModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button>
-                    <button type="submit" id="saveTransactionBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button>
+                    <button type="button" id="cancelTransactionModalBtn" class="py-2 px-4 rounded-md hover:bg-slate-100" style="color: var(--text-secondary); background-color: transparent;">Cancel</button>
+                    <button type="submit" id="saveTransactionBtn" class="py-2 px-4 rounded-md" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="categoryModal" class="modal"> <div class="modal-content"> <div class="flex justify-between items-center mb-6"> <h3 class="text-xl font-semibold text-slate-700">Manage Categories</h3> <button id="closeCategoryModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button> </div> <form id="categoryForm" class="mb-6 pb-6 border-b border-slate-200"> <input type="hidden" id="categoryIdInput"> <div class="flex flex-col sm:flex-row gap-3 items-end"> <div class="flex-grow"> <label for="categoryNameInput" class="block text-sm font-medium text-slate-600 mb-1">Name</label> <input type="text" id="categoryNameInput" name="categoryName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="flex-shrink-0"> <label for="categoryTypeInput" class="block text-sm font-medium text-slate-600 mb-1">Type</label> <select id="categoryTypeInput" name="categoryType" class="w-full sm:w-auto p-2 border border-slate-300 rounded-md shadow-sm" required> <option value="income">Income</option> <option value="outcome">Outcome</option> <option value="universal">Universal</option> </select> </div> <div class="flex-shrink-0"> <button type="submit" id="saveCategoryBtn" class="w-full sm:w-auto py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600"> <span id="saveCategoryBtnText">Add</span> </button> <button type="button" id="cancelEditCategoryBtn" class="hidden w-full sm:w-auto py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 ml-2">Cancel</button> </div> </div> </form> <h4 class="text-lg font-semibold text-slate-700 mb-3">Existing Categories</h4> <div id="categoriesList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div> </div> </div>
+    <div id="categoryModal" class="modal">
+        <div class="modal-content" style="background-color: var(--modal-bg);">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold" style="color: var(--text-primary);">Manage Categories</h3>
+                <button id="closeCategoryModalBtn" title="Close" class="p-1.5 rounded-full modal-close-btn" style="color: var(--text-secondary);"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button>
+            </div>
+            <form id="categoryForm" class="mb-6 pb-6 border-b" style="border-color: var(--border-secondary);">
+                <input type="hidden" id="categoryIdInput">
+                <div class="flex flex-col sm:flex-row gap-3 items-end">
+                    <div class="flex-grow">
+                        <label for="categoryNameInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Name</label>
+                        <input type="text" id="categoryNameInput" name="categoryName" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <label for="categoryTypeInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Type</label>
+                        <select id="categoryTypeInput" name="categoryType" class="w-full sm:w-auto p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" required> <option value="income">Income</option> <option value="outcome">Outcome</option> <option value="universal">Universal</option> </select>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button type="submit" id="saveCategoryBtn" class="w-full sm:w-auto py-2 px-4 rounded-md" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);"><span id="saveCategoryBtnText">Add</span></button>
+                        <button type="button" id="cancelEditCategoryBtn" class="hidden w-full sm:w-auto py-2 px-4 rounded-md hover:bg-slate-100 ml-2" style="color: var(--text-secondary);">Cancel</button>
+                    </div>
+                </div>
+            </form>
+            <h4 class="text-lg font-semibold mb-3" style="color: var(--text-primary);">Existing Categories</h4>
+            <div id="categoriesList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
 
     <div id="exchangeRateModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="background-color: var(--modal-bg);">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-semibold text-slate-700">Manage Exchange Rates</h3>
-                 <button id="closeExchangeRateModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn">
+                <h3 class="text-xl font-semibold" style="color: var(--text-primary);">Manage Exchange Rates</h3>
+                 <button id="closeExchangeRateModalBtn" title="Close" class="p-1.5 rounded-full modal-close-btn" style="color: var(--text-secondary);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                 </button>
             </div>
-
             <form id="exchangeRateForm">
                 <div class="mb-4">
-                    <label for="rateBaseCurrencySelect" class="block text-sm font-medium text-slate-600 mb-1">Base Currency (for these rates):</label>
-                    <select id="rateBaseCurrencySelect" name="baseCurrency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm">
-                        </select>
-                    <p class="text-xs text-slate-500 mt-1">Changing the base will require recalculating other rates upon saving.</p>
+                    <label for="rateBaseCurrencySelect" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Base Currency (for these rates):</label>
+                    <select id="rateBaseCurrencySelect" name="baseCurrency" class="w-full p-2 border rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"></select>
+                    <p class="text-xs mt-1" style="color: var(--text-secondary);">Changing the base will require recalculating other rates upon saving.</p>
                 </div>
-
-                <div id="exchangeRatesListContainer" class="space-y-3 mb-6 max-h-72 overflow-y-auto pr-1">
-                    </div>
-                
+                <div id="exchangeRatesListContainer" class="space-y-3 mb-6 max-h-72 overflow-y-auto pr-1"></div>
                 <div class="flex flex-col sm:flex-row justify-between items-center mt-2 mb-4 gap-2">
-                    <p class="text-xs text-slate-500">Rates are: 1 <span id="formBaseCurrencyLabel">USD</span> = X units of currency.</p>
+                    <p class="text-xs" style="color: var(--text-secondary);">Rates are: 1 <span id="formBaseCurrencyLabel">USD</span> = X units of currency.</p>
                     <div class="flex gap-2">
-                        <button type="button" id="importRatesBtn" class="text-xs py-1.5 px-3 rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">Import Rates</button>
-                        <button type="button" id="exportRatesBtn" class="text-xs py-1.5 px-3 rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">Export Rates</button>
+                        <button type="button" id="importRatesBtn" class="text-xs py-1.5 px-3 rounded-md whitespace-nowrap" style="background-color: var(--button-secondary-bg); color: var(--button-secondary-text);">Import Rates</button>
+                        <button type="button" id="exportRatesBtn" class="text-xs py-1.5 px-3 rounded-md whitespace-nowrap" style="background-color: var(--button-secondary-bg); color: var(--button-secondary-text);">Export Rates</button>
                     </div>
                 </div>
                 <input type="file" id="importRatesFile" class="hidden" accept=".json">
-
-
                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelExchangeRateModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 active:bg-slate-200 transition-colors">Cancel</button>
-                    <button type="submit" id="saveExchangeRatesBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 transition-colors">Save Rates</button>
+                    <button type="button" id="cancelExchangeRateModalBtn" class="py-2 px-4 rounded-md hover:bg-slate-100" style="color: var(--text-secondary); background-color: transparent;">Cancel</button>
+                    <button type="submit" id="saveExchangeRatesBtn" class="py-2 px-4 rounded-md" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);">Save Rates</button>
                 </div>
             </form>
         </div>

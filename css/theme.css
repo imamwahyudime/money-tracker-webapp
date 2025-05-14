@@ -1,0 +1,163 @@
+/* css/theme.css */
+
+/* Basic Theme Variables (Light mode is the default via :root) */
+:root {
+    --bg-primary: #f1f5f9; /* Tailwind slate-100 */
+    --bg-secondary: #ffffff; /* Tailwind white */
+    --bg-tertiary: #e2e8f0; /* Tailwind slate-200 for hovers etc. */
+
+    --text-primary: #1e293b; /* Tailwind slate-800 */
+    --text-secondary: #64748b; /* Tailwind slate-500 */
+    --text-accent: #0ea5e9; /* Tailwind sky-600 */
+    --text-on-primary-button: #ffffff;
+    --text-on-secondary-button: #334155; /* Tailwind slate-700 */
+    --text-danger: #dc2626; /* Tailwind red-600 */
+    --text-success: #16a34a; /* Tailwind green-600 */
+
+    --border-primary: #cbd5e1; /* Tailwind slate-300 */
+    --border-secondary: #e2e8f0; /* Tailwind slate-200 */
+    --border-focus: #38bdf8; /* Tailwind sky-500 */
+
+    --modal-bg: #ffffff;
+    --modal-overlay-bg: rgba(0,0,0,0.5);
+
+    --input-bg: #ffffff;
+    --input-border: #cbd5e1; /* Tailwind slate-300 */
+    --input-text: #1e293b; /* Tailwind slate-800 */
+    --input-placeholder-text: #94a3b8; /* Tailwind slate-400 */
+
+    --button-primary-bg: #0ea5e9; /* Tailwind sky-500 */
+    --button-primary-bg-hover: #0284c7; /* Tailwind sky-600 */
+    --button-secondary-bg: #e2e8f0; /* Tailwind slate-200 */
+    --button-secondary-bg-hover: #cbd5e1; /* Tailwind slate-300 */
+    --button-danger-bg: #ef4444; /* Tailwind red-500 */
+    --button-danger-bg-hover: #dc2626; /* Tailwind red-600 */
+    --button-success-bg: #22c55e; /* Tailwind green-500 */
+    --button-success-bg-hover: #16a34a; /* Tailwind green-600 */
+
+    --profile-item-hover-bg: #f0f9ff; /* Tailwind sky-50 */
+    --profile-item-active-bg: #e0f2fe; /* Tailwind sky-100 */
+    --profile-item-active-border: #0ea5e9; /* Tailwind sky-500 */
+    --profile-item-active-text: #0284c7; /* Tailwind sky-700 */
+
+    --transaction-item-hover-bg: #f8fafc; /* Tailwind slate-50 */
+    --reimbursed-text-color: #64748b; /* Tailwind slate-500 */
+    --reimbursed-amount-color: #16a34a; /* Tailwind green-600 */
+
+    --scrollbar-track-bg: #f1f1f1;
+    --scrollbar-thumb-bg: #888;
+    --scrollbar-thumb-hover-bg: #555;
+
+    --link-text: var(--text-accent);
+    --link-text-hover: #0369a1; /* Tailwind sky-700 */
+    --icon-color: var(--text-secondary);
+    --icon-hover-color: var(--text-accent);
+}
+
+/* --- Dark Theme --- */
+[data-theme="dark"] {
+    --bg-primary: #0f172a; /* slate-900 */
+    --bg-secondary: #1e293b; /* slate-800 */
+    --bg-tertiary: #334155; /* slate-700 */
+
+    --text-primary: #e2e8f0; /* slate-200 */
+    --text-secondary: #94a3b8; /* slate-400 */
+    --text-accent: #38bdf8; /* sky-400 */
+    --text-on-primary-button: #ffffff;
+    --text-on-secondary-button: #e2e8f0; /* slate-100 */
+    --text-danger: #f87171; /* red-400 */
+    --text-success: #4ade80; /* green-400 */
+
+    --border-primary: #475569; /* slate-600 */
+    --border-secondary: #334155; /* slate-700 */
+    --border-focus: #38bdf8; /* sky-500 */
+
+    --modal-bg: #1e293b; /* slate-800 */
+    --modal-overlay-bg: rgba(0,0,0,0.7);
+
+    --input-bg: #334155; /* slate-700 */
+    --input-border: #475569; /* slate-600 */
+    --input-text: #e2e8f0; /* slate-100 */
+    --input-placeholder-text: #64748b; /* slate-500 */
+
+    --button-primary-bg: #0284c7; /* sky-600 */
+    --button-primary-bg-hover: #0369a1; /* sky-700 */
+    --button-secondary-bg: #334155; /* slate-700 */
+    --button-secondary-bg-hover: #475569; /* slate-600 */
+    --button-danger-bg: #dc2626; /* red-600 */
+    --button-danger-bg-hover: #b91c1c; /* red-700 */
+    --button-success-bg: #16a34a; /* green-600 */
+    --button-success-bg-hover: #15803d; /* green-700 */
+
+    --profile-item-hover-bg: #334155; /* slate-700 */
+    --profile-item-active-bg: #334155; /* slate-700 */
+    --profile-item-active-border: #38bdf8; /* sky-500 */
+    --profile-item-active-text: #7dd3fc; /* sky-300 */
+
+    --transaction-item-hover-bg: #334155; /* slate-700 */
+    --reimbursed-text-color: #94a3b8; /* slate-400 */
+    --reimbursed-amount-color: #4ade80; /* green-400 */
+
+    --scrollbar-track-bg: #1e293b; /* slate-800 */
+    --scrollbar-thumb-bg: #475569; /* slate-600 */
+    --scrollbar-thumb-hover-bg: #64748b; /* slate-500 */
+
+    --link-text: var(--text-accent);
+    --link-text-hover: #7dd3fc; /* sky-300 */
+    --icon-color: var(--text-secondary);
+    --icon-hover-color: var(--text-accent);
+}
+
+/* --- Sepia Theme --- */
+[data-theme="sepia"] {
+    --bg-primary: #f4ecd8;
+    --bg-secondary: #e9e0cf;
+    --bg-tertiary: #e0d8c7;
+
+    --text-primary: #5b4636;
+    --text-secondary: #7d6b5a;
+    --text-accent: #8c5a32;
+    --text-on-primary-button: #f4ecd8;
+    --text-on-secondary-button: #5b4636;
+    --text-danger: #a52a2a; /* Brown for danger */
+    --text-success: #556b2f; /* Dark Olive Green for success */
+
+    --border-primary: #d3c7b3;
+    --border-secondary: #c0b5a0;
+    --border-focus: #8c5a32;
+
+    --modal-bg: #e9e0cf;
+    --modal-overlay-bg: rgba(91,70,54,0.5); /* Brownish overlay */
+
+    --input-bg: #fdf6e3;
+    --input-border: #d3c7b3;
+    --input-text: #5b4636;
+    --input-placeholder-text: #8d7e6f;
+
+    --button-primary-bg: #8c5a32;
+    --button-primary-bg-hover: #7c4a22;
+    --button-secondary-bg: #d3c7b3;
+    --button-secondary-bg-hover: #c0b5a0;
+    --button-danger-bg: #b22222; /* Firebrick */
+    --button-danger-bg-hover: #8b0000; /* DarkRed */
+    --button-success-bg: #6b8e23; /* OliveDrab */
+    --button-success-bg-hover: #556b2f; /* DarkOliveGreen */
+
+    --profile-item-hover-bg: #e0d8c7;
+    --profile-item-active-bg: #d8cebc;
+    --profile-item-active-border: #8c5a32;
+    --profile-item-active-text: #7c4a22;
+
+    --transaction-item-hover-bg: #e0d8c7;
+    --reimbursed-text-color: #8f7a66;
+    --reimbursed-amount-color: #556b2f;
+
+    --scrollbar-track-bg: #e0d8c7;
+    --scrollbar-thumb-bg: #bcae99;
+    --scrollbar-thumb-hover-bg: #a89c88;
+
+    --link-text: var(--text-accent);
+    --link-text-hover: #7c4a22;
+    --icon-color: var(--text-secondary);
+    --icon-hover-color: var(--text-accent);
+}

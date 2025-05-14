@@ -1,6 +1,6 @@
 // js/config.js
 
-export const STORAGE_KEY = 'moneyTrackerData_v2.5_themes'; // Incremented version
+export const STORAGE_KEY = 'moneyTrackerData_v3.0_modular'; // Updated version for new structure
 
 export const CURRENCY_SYMBOLS = {
     IDR: 'Rp',
@@ -40,9 +40,9 @@ export const DEFAULT_EXCHANGE_RATES = {
     base: 'USD',
     rates: {
         'USD': 1,
-        'IDR': 16200, // Updated to current approximate rate for May 2025
+        'IDR': 16200,
         'EUR': 0.92,
-        'JPY': 155, // Updated to current approximate rate for May 2025
+        'JPY': 155,
         'SGD': 1.35
     },
     lastUpdated: new Date().toISOString()
@@ -50,10 +50,9 @@ export const DEFAULT_EXCHANGE_RATES = {
 
 export const DEFAULT_FINANCIAL_MONTH_START_DAY = 1;
 
-// New Theme Configuration
 export const DEFAULT_THEME = 'light';
 export const AVAILABLE_THEMES = [
     { value: 'light', name: 'Light Mode' },
     { value: 'dark', name: 'Dark Mode' },
-    { value: 'sepia', name: 'Sepia (Eye-Friendly)' } // Using 'sepia' as the eye-friendly mode for now
+    { value: 'sepia', name: 'Sepia (Eye-Friendly)' }
 ];

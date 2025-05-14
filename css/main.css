@@ -1,0 +1,230 @@
+/* css/main.css */
+
+/* Base HTML and Body styles using CSS Variables for theming */
+html {
+    font-family: 'Inter', sans-serif; /* Match Tailwind config */
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styles using CSS Variables */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover-bg);
+}
+
+/* General Interactive Item Styles */
+.profile-item, .transaction-item, .category-item, .rate-item {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Profile Item Specifics */
+.profile-item { /* Default state, hover and active are now mostly variable driven */
+    /* border-left-width: 4px; remove if not always visible */
+    /* border-left-color: transparent; */
+}
+.profile-item:hover {
+    background-color: var(--profile-item-hover-bg);
+    /* border-left-color: var(--text-accent); Consider if this is desired for non-active hover */
+}
+.profile-item.active {
+    background-color: var(--profile-item-active-bg);
+    border-left-width: 4px; /* Ensure this is desired */
+    border-left-color: var(--profile-item-active-border);
+    font-weight: 500; /* Tailwind's font-medium */
+}
+.profile-item.active .profile-name { /* Specific text color for active profile name */
+    color: var(--profile-item-active-text);
+}
+
+/* Transaction, Category, Rate Item Hovers */
+.transaction-item:hover,
+.category-item:hover,
+.rate-item:hover {
+    background-color: var(--transaction-item-hover-bg); /* Using a generic hover bg */
+}
+
+/* Icon with Text Alignment */
+.icon-text-align {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem; /* Tailwind's gap-2 */
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 50; /* Tailwind's z-50 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: var(--modal-overlay-bg); /* Use variable for overlay */
+    align-items: center;
+    justify-content: center;
+}
+.modal.modal-open {
+    display: flex; /* Show modal */
+}
+.modal-content {
+    background-color: var(--modal-bg); /* Use variable */
+    color: var(--text-primary); /* Ensure modal text uses primary text color */
+    padding: 24px; /* Tailwind's p-6 */
+    border-radius: 8px; /* Tailwind's rounded-lg */
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Tailwind's shadow-lg or shadow-xl */
+    animation: modalOpenAnimation 0.3s ease-out;
+}
+@keyframes modalOpenAnimation {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.modal-close-btn {
+    transition: transform 0.2s ease-in-out, background-color 0.2s;
+    color: var(--text-secondary); /* Themed color */
+}
+.modal-close-btn:hover {
+    transform: rotate(90deg);
+    background-color: var(--bg-tertiary); /* Themed hover bg */
+}
+
+/* Input Focus Styles (Tailwind like) */
+input:focus, select:focus, button:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--border-focus); /* Use variable */
+}
+
+/* Sizing for icon buttons in lists */
+.transaction-item button, .category-item button, .profile-item button {
+    min-width: 32px;  /* Tailwind's w-8 */
+    min-height: 32px; /* Tailwind's h-8 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Transaction Reimbursed Styles */
+.transaction-reimbursed {
+    text-decoration: line-through;
+    color: var(--reimbursed-text-color); /* Themed */
+}
+.transaction-reimbursed .font-semibold { /* Specifically target amount span */
+    color: var(--reimbursed-amount-color) !important; /* Ensure this overrides Tailwind's red/green */
+    text-decoration: none !important;
+}
+
+
+/* Theme Specific Overrides Not Covered by Variables above (e.g. date picker icon) */
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+[data-theme="sepia"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="sepia"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: contrast(0.5) sepia(0.3); /* Adjust for better visibility on sepia */
+}
+
+/*
+    The following specific overrides for text colors based on themes (e.g., text-green-600 on sepia)
+    are tricky if Tailwind is still applying its utility classes.
+    It's better to use CSS variables for these colors if possible.
+    For instance, instead of relying on Tailwind's .text-green-600, you could have a variable
+    --text-income: var(--text-success); (defined in each theme)
+    and apply a class like .text-income.
+
+    If you must override Tailwind classes, you might need more specificity or !important,
+    but it's generally better to work with CSS variables for theming.
+    The current variables --text-success and --text-danger should be used by JS to set classes
+    or directly via inline styles if absolutely necessary, rather than fighting Tailwind selectors.
+*/
+
+/* Styles for elements using variables - applying general styles */
+aside { background-color: var(--bg-secondary) !important; } /* Tailwind utilities are strong */
+aside h1, aside h2, aside label, aside p, aside span, aside button, aside select { color: var(--text-primary); }
+aside #profilesListEl .profile-item .profile-name { color: var(--text-primary); }
+aside #profilesListEl .profile-item.active .profile-name { color: var(--profile-item-active-text); }
+
+aside select, aside input[type="number"], aside input[type="date"], aside input[type="datetime-local"] {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text); /* Ensure text within inputs is themed */
+}
+aside #addProfileBtn { color: var(--text-accent); }
+
+/* Main content uses variables */
+main { background-color: var(--bg-primary) !important; }
+main h2, main h3, main p, main label, main span { color: var(--text-primary); }
+main #profileCurrencyInfoDisplay, main #activeDateRangeDisplay { color: var(--text-accent); }
+main #projectionDateInput {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+main #summarySection > div { background-color: var(--bg-secondary); }
+main #transactionsListContainer { background-color: var(--bg-secondary); }
+main #transactionsListEl { border-top: 1px solid var(--border-secondary); } /* Example for divider */
+main #noTransactionsMessage { color: var(--text-secondary); }
+
+/* Modals content uses variables */
+.modal-content h3, .modal-content h4, .modal-content label, .modal-content p { color: var(--text-primary); }
+.modal-content input, .modal-content select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+.modal-content form { border-color: var(--border-secondary); } /* Border for category form */
+.modal-content button[type="submit"] {
+    background-color: var(--button-primary-bg);
+    color: var(--text-on-primary-button);
+}
+.modal-content button[type="submit"]:hover { filter: brightness(90%); }
+
+.modal-content button[type="button"]:not(.modal-close-btn) { /* Cancel buttons */
+    color: var(--text-secondary);
+    /* background-color: transparent; To make it look more like a link */
+}
+.modal-content button[type="button"]:not(.modal-close-btn):hover {
+    background-color: var(--bg-tertiary); /* Subtle hover for cancel */
+}
+
+/* Explicit styling for some buttons if Tailwind utilities aren't enough or for consistency */
+#viewAllProfilesBtn, #addIncomeBtn, #addOutcomeBtn, #saveProfileBtn, #saveTransactionBtn, #saveCategoryBtn, #saveExchangeRatesBtn {
+    /* These primarily use Tailwind classes, but if specific variable-driven overrides are needed: */
+    /* e.g. background-color: var(--button-primary-bg); color: var(--button-primary-text); */
+}
+/* For secondary-style buttons like "Manage Categories", "Manage Rates", "Import/Export Rates" */
+#manageCategoriesBtn, #manageExchangeRatesBtn, #importRatesBtn, #exportRatesBtn,
+#importDataBtn, #exportDataBtn /* Data management buttons */ {
+    background-color: var(--button-secondary-bg);
+    color: var(--text-on-secondary-button);
+}
+#manageCategoriesBtn:hover, #manageExchangeRatesBtn:hover, #importRatesBtn:hover, #exportRatesBtn:hover,
+#importDataBtn:hover, #exportDataBtn:hover {
+    filter: brightness(95%);
+}
+
+/* Ensure transaction amount colors take precedence if Tailwind utilities conflict with theming */
+.text-green-600 { color: var(--text-success) !important; } /* For income */
+.text-red-600 { color: var(--text-danger) !important; }   /* For outcome */

@@ -1,108 +1,106 @@
 // js/main.js
-import * as dom from './domElements.js';
-import * as state from './state.js';
-import * as ui from './ui.js';
+import * as dom from './domElements.js'; // Still useful for some direct references if any
+import { loadAppState, getAppState } from './state/appState.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded and parsed");
-    state.loadData(); // Load data first
-    ui.renderApp(); // Then render the app with loaded data
+// Services
+import { applyTheme, populateThemeSelector } from './services/themeService.js';
 
-    // --- Sidebar Profile Listeners ---
-    dom.addProfileBtn.addEventListener('click', () => ui.openProfileModal());
-    dom.viewAllProfilesBtn.addEventListener('click', () => {
-        state.updateState('activeProfileId', 'all');
-        state.saveData();
-        ui.renderApp();
-    });
+// UI Modules
+import { initializeModalEscapeListener } from './ui/modalUIs.js';
+import { renderProfilesList, populateProfileModalForm } from './ui/profileUI.js';
+import { renderCategoriesList, populateCategoryForm, resetCategoryFormUI } from './ui/categoryUI.js';
+import { renderExchangeRateInfoSidebar, renderExchangeRatesForm } from './ui/exchangeRateUI.js';
+import { renderTransactionsList } from './ui/transactionUI.js';
+import { renderDashboardHeader, renderDashboardSummary } from './ui/dashboardUI.js';
+import { renderAppSettingsUI } from './ui/appSettingsUI.js';
 
-    // --- Sidebar App Settings Listeners ---
-    dom.appDisplayCurrencySelect.addEventListener('change', (event) => {
-        state.updateState('displayCurrency', event.target.value);
-        state.saveData();
-        ui.renderApp(); // Re-render to reflect currency changes in summaries if 'All Profiles' is active
-    });
-    dom.manageCategoriesBtn.addEventListener('click', ui.openCategoryModal);
-    dom.manageExchangeRatesBtn.addEventListener('click', ui.openExchangeRatesModal);
+// Handler Modules & their specific action handlers that might be passed as callbacks
+import * as profileHandlers from './handlers/profileHandlers.js';
+import * as transactionHandlers from './handlers/transactionHandlers.js';
+import * as categoryHandlers from './handlers/categoryHandlers.js';
+import * as exchangeRateHandlers from './handlers/exchangeRateHandlers.js';
+import * as appSettingsAndDataHandlers from './handlers/appSettingsAndDataHandlers.js';
 
-    // --- Main Header Date Projection Listeners (NEW) ---
-    dom.projectionDateInput.addEventListener('change', (event) => {
-        const newProjectionDate = event.target.value ? new Date(event.target.value).toISOString() : null;
-        state.updateState('projectionDate', newProjectionDate);
-        state.saveData();
-        ui.renderApp();
-    });
+/**
+ * Main function to render the entire application UI based on the current state.
+ * This function orchestrates calls to various UI rendering modules.
+ */
+function renderApp() {
+    const currentAppState = getAppState(); // Get the latest state
 
-    dom.resetProjectionDateBtn.addEventListener('click', () => {
-        state.updateState('projectionDate', null);
-        dom.projectionDateInput.value = ''; // Clear the input field visually
-        state.saveData();
-        ui.renderApp();
-    });
+    // 1. Apply Theme and Populate Theme Selector (handled by themeService)
+    // Theme should be applied first as it can affect calculations or visibility.
+    applyTheme(currentAppState.settings.currentTheme);
+    populateThemeSelector(currentAppState.settings.currentTheme);
 
+    // 2. Render App Settings UI elements (Display Currency, Projection Date)
+    renderAppSettingsUI();
 
-    // --- Main Content Transaction Buttons ---
-    dom.addIncomeBtn.addEventListener('click', () => {
-        const activeProfileId = state.getState().activeProfileId;
-        if (activeProfileId === 'all' || !state.getProfileById(activeProfileId)) {
-            alert("Please select a specific profile to add income.");
-            return;
-        }
-        ui.openTransactionModal('income', null, activeProfileId);
-    });
-    dom.addOutcomeBtn.addEventListener('click', () => {
-        const activeProfileId = state.getState().activeProfileId;
-        if (activeProfileId === 'all' || !state.getProfileById(activeProfileId)) {
-            alert("Please select a specific profile to add an outcome.");
-            return;
-        }
-        ui.openTransactionModal('outcome', null, activeProfileId);
-    });
+    // 3. Render Profile specific UI
+    // renderProfilesList needs callbacks for edit/delete actions on items
+    renderProfilesList(
+        profileHandlers.handleOpenEditProfileModal,
+        profileHandlers.handleDeleteProfile
+    );
 
+    // 4. Render Dashboard Header and Summary
+    renderDashboardHeader();
+    renderDashboardSummary();
 
-    // --- Profile Modal Listeners ---
-    dom.profileForm.addEventListener('submit', ui.handleProfileFormSubmit);
-    dom.closeProfileModalBtn.addEventListener('click', ui.closeProfileModal);
-    dom.cancelProfileModalBtn.addEventListener('click', ui.closeProfileModal);
+    // 5. Render Transactions List
+    // renderTransactionsList needs callbacks for edit/delete actions on items
+    renderTransactionsList(
+        transactionHandlers.handleOpenTransactionModal, // For editing existing
+        transactionHandlers.handleDeleteTransaction
+    );
 
-    // --- Transaction Modal Listeners ---
-    dom.transactionForm.addEventListener('submit', ui.handleTransactionFormSubmit);
-    dom.closeTransactionModalBtn.addEventListener('click', ui.closeTransactionModal);
-    dom.cancelTransactionModalBtn.addEventListener('click', ui.closeTransactionModal);
+    // 6. Render Exchange Rate Info in Sidebar
+    renderExchangeRateInfoSidebar();
 
-    // --- Category Modal Listeners ---
-    dom.categoryForm.addEventListener('submit', ui.handleCategoryFormSubmit);
-    dom.closeCategoryModalBtn.addEventListener('click', ui.closeCategoryModal);
-    dom.cancelEditCategoryBtn.addEventListener('click', ui.resetCategoryForm);
+    // 7. Other UI updates if needed, e.g., modal content if they are always rendered
+    // For now, modals are populated when opened. Category list in its modal is rendered when modal opens.
 
-    // --- Exchange Rate Modal Listeners ---
-    dom.exchangeRateForm.addEventListener('submit', ui.handleSaveExchangeRates);
-    dom.closeExchangeRateModalBtn.addEventListener('click', ui.closeExchangeRatesModal);
-    dom.cancelExchangeRateModalBtn.addEventListener('click', ui.closeExchangeRatesModal);
-    dom.importRatesBtn.addEventListener('click', () => dom.importRatesFile.click());
-    dom.importRatesFile.addEventListener('change', ui.handleImportExchangeRatesFile);
-    dom.exportRatesBtn.addEventListener('click', ui.handleExportExchangeRatesFile);
-
-
-    // --- Data Management Listeners ---
-    dom.importDataBtn.addEventListener('click', () => dom.importFile.click());
-    dom.importFile.addEventListener('change', ui.handleImportData);
-    dom.exportDataBtn.addEventListener('click', ui.handleExportData);
-
-
-    // Initial call to Lucide after app render (already in renderApp)
+    // 8. Refresh Lucide icons if any were dynamically added/changed
     if (typeof lucide !== 'undefined' && lucide.createIcons) {
-        // lucide.createIcons(); // This is now called at the end of renderApp()
+        lucide.createIcons();
     }
+    console.log("Application re-rendered.");
+}
 
-    // Handle Escape key for modals
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            if (dom.profileModal.classList.contains('modal-open')) ui.closeProfileModal();
-            if (dom.transactionModal.classList.contains('modal-open')) ui.closeTransactionModal();
-            if (dom.categoryModal.classList.contains('modal-open')) ui.closeCategoryModal();
-            if (dom.exchangeRateModal.classList.contains('modal-open')) ui.closeExchangeRatesModal();
-        }
-    });
-    console.log("Initial setup and event listeners attached.");
-});
+/**
+ * Initializes the application.
+ * Loads data, sets up event listeners, and performs the initial render.
+ */
+function initializeApp() {
+    console.log("DOM fully loaded and parsed. Initializing application...");
+
+    // 1. Load initial application state (from localStorage or defaults)
+    loadAppState();
+
+    // 2. Set the main renderApp callback for all handler modules
+    // This allows handlers to trigger a full UI refresh when state changes.
+    profileHandlers.setRenderAppCallback(renderApp);
+    transactionHandlers.setRenderAppCallback(renderApp);
+    categoryHandlers.setRenderAppCallback(renderApp);
+    exchangeRateHandlers.setRenderAppCallback(renderApp);
+    appSettingsAndDataHandlers.setRenderAppCallback(renderApp);
+
+    // 3. Initialize all event listeners
+    profileHandlers.initializeProfileEventListeners();
+    transactionHandlers.initializeTransactionEventListeners();
+    categoryHandlers.initializeCategoryEventListeners();
+    exchangeRateHandlers.initializeExchangeRateEventListeners();
+    appSettingsAndDataHandlers.initializeAppSettingsAndDataEventListeners();
+    initializeModalEscapeListener(); // General Escape key for modals
+
+    // 4. Perform the initial render of the application
+    renderApp();
+
+    console.log("Application initialized and initial render complete.");
+}
+
+// --- Application Entry Point ---
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+// Expose renderApp globally for debugging or specific manual calls if ever needed (optional)
+// window.renderApp = renderApp;
