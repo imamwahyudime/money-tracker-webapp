@@ -29,7 +29,6 @@ function renderApp() {
     const currentAppState = getAppState(); // Get the latest state
 
     // 1. Apply Theme and Populate Theme Selector (handled by themeService)
-    // Theme should be applied first as it can affect calculations or visibility.
     applyTheme(currentAppState.settings.currentTheme);
     populateThemeSelector(currentAppState.settings.currentTheme);
 
@@ -38,9 +37,11 @@ function renderApp() {
 
     // 3. Render Profile specific UI
     // renderProfilesList needs callbacks for edit/delete actions on items
+    // AND the main renderApp function to trigger re-render on profile selection
     renderProfilesList(
         profileHandlers.handleOpenEditProfileModal,
-        profileHandlers.handleDeleteProfile
+        profileHandlers.handleDeleteProfile,
+        renderApp // <<< MODIFIED: Pass renderApp function
     );
 
     // 4. Render Dashboard Header and Summary
@@ -57,10 +58,9 @@ function renderApp() {
     // 6. Render Exchange Rate Info in Sidebar
     renderExchangeRateInfoSidebar();
 
-    // 7. Other UI updates if needed, e.g., modal content if they are always rendered
-    // For now, modals are populated when opened. Category list in its modal is rendered when modal opens.
+    // 7. Other UI updates if needed (e.g., modal content if they are always rendered)
 
-    // 8. Refresh Lucide icons if any were dynamically added/changed
+    // 8. Refresh Lucide icons
     if (typeof lucide !== 'undefined' && lucide.createIcons) {
         lucide.createIcons();
     }
@@ -74,11 +74,10 @@ function renderApp() {
 function initializeApp() {
     console.log("DOM fully loaded and parsed. Initializing application...");
 
-    // 1. Load initial application state (from localStorage or defaults)
+    // 1. Load initial application state
     loadAppState();
 
     // 2. Set the main renderApp callback for all handler modules
-    // This allows handlers to trigger a full UI refresh when state changes.
     profileHandlers.setRenderAppCallback(renderApp);
     transactionHandlers.setRenderAppCallback(renderApp);
     categoryHandlers.setRenderAppCallback(renderApp);
@@ -101,6 +100,3 @@ function initializeApp() {
 
 // --- Application Entry Point ---
 document.addEventListener('DOMContentLoaded', initializeApp);
-
-// Expose renderApp globally for debugging or specific manual calls if ever needed (optional)
-// window.renderApp = renderApp;

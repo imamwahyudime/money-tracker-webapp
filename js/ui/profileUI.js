@@ -2,11 +2,11 @@
 import * as dom from '../domElements.js';
 import { getProfiles, getActiveProfileId, setActiveProfileId } from '../state/profileState.js';
 import { DEFAULT_FINANCIAL_MONTH_START_DAY, CURRENCY_SYMBOLS } from '../config.js';
-import { getAppState, updateAppState } from '../state/appState.js'; // For displayCurrency
-import { openProfileModalUI } from './modalUIs.js'; // Using the refactored modal open
+import { getAppState } from '../state/appState.js'; // For displayCurrency
+// Removed: import { openProfileModalUI } from './modalUIs.js'; as modal opening is handled by profileHandlers
 
 // Function to create a single profile list item element
-function createProfileListItem(profile, currentActiveId, onEdit, onDelete) {
+function createProfileListItem(profile, currentActiveId, onEdit, onDelete, renderAppFn) { // MODIFIED: Added renderAppFn
     const itemContainer = document.createElement('div');
     itemContainer.className = `profile-item p-3 rounded-md cursor-pointer border border-transparent flex justify-between items-center text-sm ${profile.id === currentActiveId ? 'active' : ''}`;
     itemContainer.dataset.profileId = profile.id;
@@ -16,7 +16,8 @@ function createProfileListItem(profile, currentActiveId, onEdit, onDelete) {
     nameSpan.textContent = profile.name;
     nameSpan.addEventListener('click', (e) => {
         e.stopPropagation();
-        setActiveProfileId(profile.id); // This will trigger a re-render via main.js
+        setActiveProfileId(profile.id); // This updates state and saves
+        if (renderAppFn) renderAppFn();  // MODIFIED: Call the passed render function
     });
     itemContainer.appendChild(nameSpan);
 
@@ -30,7 +31,7 @@ function createProfileListItem(profile, currentActiveId, onEdit, onDelete) {
     editBtn.style.color = 'var(--text-secondary)';
     editBtn.onmouseover = () => { editBtn.style.backgroundColor = 'var(--bg-tertiary)'; editBtn.style.color = 'var(--text-accent)'; };
     editBtn.onmouseout = () => { editBtn.style.backgroundColor = 'transparent'; editBtn.style.color = 'var(--text-secondary)'; };
-    editBtn.addEventListener('click', (e) => { e.stopPropagation(); onEdit(profile); });
+    editBtn.addEventListener('click', (e) => { e.stopPropagation(); onEdit(profile); }); // onEdit is handleOpenEditProfileModal
     controlsDiv.appendChild(editBtn);
 
     const delBtn = document.createElement('button');
@@ -40,13 +41,14 @@ function createProfileListItem(profile, currentActiveId, onEdit, onDelete) {
     delBtn.style.color = 'var(--text-secondary)';
     delBtn.onmouseover = () => { delBtn.style.backgroundColor = 'var(--bg-tertiary)'; delBtn.style.color = 'var(--text-danger)'; };
     delBtn.onmouseout = () => { delBtn.style.backgroundColor = 'transparent'; delBtn.style.color = 'var(--text-secondary)'; };
-    delBtn.addEventListener('click', (e) => { e.stopPropagation(); onDelete(profile.id, profile.name); });
+    delBtn.addEventListener('click', (e) => { e.stopPropagation(); onDelete(profile.id, profile.name); }); // onDelete is handleDeleteProfile
     controlsDiv.appendChild(delBtn);
 
     itemContainer.appendChild(controlsDiv);
     itemContainer.addEventListener('click', (event) => {
         if (!event.target.closest('button')) { // Only change active profile if not clicking a button
             setActiveProfileId(profile.id);
+            if (renderAppFn) renderAppFn(); // MODIFIED: Call the passed render function
         }
     });
     return itemContainer;
@@ -57,8 +59,9 @@ function createProfileListItem(profile, currentActiveId, onEdit, onDelete) {
  * Renders the list of profiles in the sidebar.
  * @param {function} onEditProfile - Callback function when edit profile is clicked.
  * @param {function} onDeleteProfile - Callback function when delete profile is clicked.
+ * @param {function} renderAppFn - The main application render function. // MODIFIED: Added renderAppFn
  */
-export function renderProfilesList(onEditProfile, onDeleteProfile) {
+export function renderProfilesList(onEditProfile, onDeleteProfile, renderAppFn) { // MODIFIED: Added renderAppFn
     const profiles = getProfiles();
     const activeId = getActiveProfileId();
     dom.profilesListEl.innerHTML = '';
@@ -70,12 +73,13 @@ export function renderProfilesList(onEditProfile, onDeleteProfile) {
         dom.profilesListEl.appendChild(p);
     } else {
         profiles.forEach(profile => {
-            const profileElement = createProfileListItem(profile, activeId, onEditProfile, onDeleteProfile);
+            // Pass renderAppFn down to createProfileListItem
+            const profileElement = createProfileListItem(profile, activeId, onEditProfile, onDeleteProfile, renderAppFn); // MODIFIED
             dom.profilesListEl.appendChild(profileElement);
         });
     }
     if (typeof lucide !== 'undefined' && lucide.createIcons) {
-       lucide.createIcons(); // Refresh icons if any were added dynamically
+       lucide.createIcons();
     }
 }
 
@@ -92,15 +96,14 @@ export function populateProfileModalForm(profile) {
         dom.profileCurrencyInput.value = profile.currency;
         dom.profileFinancialMonthStartDayInput.value = profile.financialMonthStartDay || DEFAULT_FINANCIAL_MONTH_START_DAY;
     } else {
-        dom.profileIdInput.value = ''; // Important for distinguishing add vs edit
+        dom.profileIdInput.value = '';
         dom.profileNameInput.value = '';
-        dom.profileCurrencyInput.value = appSettings.displayCurrency; // Default to app's display currency
+        dom.profileCurrencyInput.value = appSettings.displayCurrency;
         dom.profileFinancialMonthStartDayInput.value = DEFAULT_FINANCIAL_MONTH_START_DAY;
     }
-    // Populate currency dropdown options - could be done once at init
-    // For now, ensuring it has the symbols if not already populated.
-    if(dom.profileCurrencyInput.options.length <= 1){ // Basic check if already populated
-        dom.profileCurrencyInput.innerHTML = ''; // Clear if needed
+
+    if(dom.profileCurrencyInput.options.length <= 1 || !dom.profileCurrencyInput.querySelector(`option[value="${appSettings.displayCurrency}"]`)){
+        dom.profileCurrencyInput.innerHTML = '';
         Object.keys(CURRENCY_SYMBOLS).forEach(code => {
             const option = document.createElement('option');
             option.value = code;

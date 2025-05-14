@@ -1,82 +1,145 @@
-# Money Tracker Pro (In-Development)
+# Money Tracker Pro
 
-**Version:** 0.11.2
+Money Tracker Pro is a client-side web application designed to help users track their income and expenses across different financial profiles. It utilizes `localStorage` to save data directly in the user's browser, ensuring privacy and offline accessibility once loaded. The application supports multiple currencies, exchange rate management, transaction categorization, and theme customization.
 
-Money Tracker Pro is a web-based application designed to help users manage their finances across multiple profiles. Users can track income and expenses for personal use, different business ventures, or any other distinct financial entities. The application aims to provide a clear, user-friendly interface for financial oversight, with data stored locally in the browser and features for data import/export and currency conversion.
+This project is built with HTML, CSS (Tailwind CSS via CDN for utilities, and custom CSS for theming/styling), and vanilla JavaScript using ES6 Modules.
 
-## Features Implemented So Far:
+## Features:
 
-* **Multi-Profile Management:**
-    * **Create Profiles:** Users can create multiple financial profiles (e.g., "Personal," "Company A").
-    * **Profile-Specific Currency:** Each profile has its own currency (IDR, USD, JPY, EUR, SGD supported).
-    * **Select Active Profile:** Users can select a specific profile to view its dashboard and manage its transactions.
-    * **Edit Profiles:** Edit existing profile names and currencies via icons in the profile list.
-    * **Delete Profiles:** Delete profiles (with confirmation), which also removes all associated transactions.
-    * **"View All Profiles" Mode:** A dashboard view that aggregates financial summaries.
-* **Transaction Management (Per Profile):**
-    * **Add Income/Outcome:** Users can add income and outcome transactions to the currently selected profile.
-    * **Transaction Details:** Each transaction includes a description, amount, date & time, and a category.
-    * **Edit Transactions:** Existing transactions can be modified.
-    * **Delete Transactions:** Transactions can be removed from a profile.
-* **Category Management:**
-    * **Manage Categories:** A dedicated modal to add, edit (name, type), and delete user-defined categories.
-    * **Category Types:** Categories can be 'income', 'outcome', or 'universal'.
-    * **Default Categories:** A predefined set of categories is available initially.
-    * **'Uncategorized' Default:** A non-deletable 'Uncategorized' category serves as a fallback.
-    * **Transaction Reassignment:** Deleting a category reassigns its associated transactions to 'Uncategorized'.
-* **Dashboard & Summary:**
-    * **Financial Overview:** Displays Total Income, Total Outcome, and Net Balance.
-    * **Single Profile View:** Totals are displayed in the profile's own currency.
-    * **"All Profiles" View:** Aggregated totals are converted and displayed in a user-selectable global "Display Currency" using stored exchange rates.
-    * **Recent Transactions List:** Shows transactions for the selected profile or all profiles, including category information.
-* **Exchange Rate Management & Currency Conversion:**
-    * **Store Exchange Rates:** Application stores exchange rates against a user-selectable base currency.
-    * **Manage Rates UI:** A modal allows users to:
-        * View current rates.
-        * Select a new base currency from supported options (IDR, USD, JPY, EUR, SGD).
-        * Edit the rates of all supported currencies against the current base.
-        * Saving rates with a new base currency recalculates all other rates relative to the new base.
-    * **Rate Information Display:** The sidebar shows the current base currency for rates and the "last updated" timestamp.
-    * **Conversion Logic:** A utility function converts amounts between currencies based on the stored rates.
-* **Data Persistence:**
-    * **Local Storage:** All application data (profiles, transactions, categories, display currency choice, exchange rates) is saved in the browser's `localStorage`.
-* **Import/Export (Full App Data):**
-    * **Export App Data:** Functionality to export all application data into a single JSON file.
-    * **Import App Data:** Functionality to import data from such a JSON file, overwriting current data after user confirmation.
-* **User Interface:**
-    * **Responsive Design:** Built with Tailwind CSS.
-    * **Icons:** Uses Lucide Icons (via CDN).
-    * **Modals:** For adding/editing profiles, transactions, and managing categories and exchange rates.
+* **Multiple Profiles**: Create and manage separate financial profiles (e.g., personal, business, travel fund).
+* **Transaction Tracking**: Log income and outcome transactions with descriptions, amounts, dates, and categories.
+* **Currency Management**:
+    * Each profile can have its own default currency.
+    * Set a global display currency for viewing aggregated data from "All Profiles".
+    * Manage exchange rates between supported currencies.
+* **Categorization**: Assign transactions to predefined or custom categories (income, outcome, universal).
+* **Dashboard Summary**: View total income, total outcome, and net balance for the selected profile or all profiles, based on a configurable date range or projection date.
+* **Date Projection**: Preview financial summaries up to a future date.
+* **Theming**: Choose between Light, Dark, and Sepia themes for user comfort.
+* **Data Persistence**: All data is saved locally in the browser's `localStorage`.
+* **Data Management**:
+    * Import and export complete application data (profiles, transactions, settings) in JSON format.
+    * Import and export exchange rate data in JSON format.
+* **Responsive Design**: Basic responsiveness for usability on different screen sizes.
 
-## Technology Stack:
+## Tech Stack:
 
-* **Frontend:** HTML, CSS, Vanilla JavaScript
-* **Styling:** Tailwind CSS (via CDN)
-* **Icons:** Lucide Icons (via CDN)
-* **Data Storage:** Browser `localStorage`
+* **HTML5**
+* **CSS3**:
+    * Custom CSS for base styling, component styles, and theming (using CSS Variables).
+    * **Tailwind CSS (v3 via Play CDN)**: For utility-first styling.
+* **JavaScript (ES6+)**:
+    * Vanilla JavaScript (no frameworks like React, Vue, or Angular).
+    * ES6 Modules for code organization.
+* **Lucide Icons (via CDN)**: For icons.
+* **Browser `localStorage`**: For data storage.
 
-## Current Structure (Modular JavaScript):
+## Project Structure:
 
-The application is structured with a main `index.html` file and a `js/` subdirectory containing the following JavaScript modules:
-* `main.js`: Main entry point, global event listener setup.
-* `ui.js`: Handles all DOM manipulations, UI rendering, modal controls, and form submissions.
-* `state.js`: Manages the application's state, core data logic, and `localStorage` interactions.
-* `domElements.js`: Centralizes DOM element selections.
-* `config.js`: Stores application constants (storage keys, default categories, default exchange rates, currency symbols).
-* `utils.js`: Contains utility functions (ID generation, currency formatting, date formatting, currency conversion).
+├── css/
+│   ├── main.css        # Custom global and component styles
+│   └── theme.css       # CSS variables for theming (light, dark, sepia)
+├── js/
+│   ├── config.js       # Global configuration constants
+│   ├── domElements.js  # Centralized DOM element selections
+│   ├── main.js         # Main application entry point, event listeners, render orchestration
+│   ├── utils.js        # Utility functions (formatting, ID generation, etc.)
+│   ├── handlers/       # Modules for handling user interactions and events
+│   │   ├── appSettingsAndDataHandlers.js
+│   │   ├── categoryHandlers.js
+│   │   ├── exchangeRateHandlers.js
+│   │   ├── profileHandlers.js
+│   │   └── transactionHandlers.js
+│   ├── services/       # Modules for specific services
+│   │   ├── storageService.js
+│   │   └── themeService.js
+│   ├── state/          # Modules for managing application state
+│   │   ├── appState.js
+│   │   ├── categoryState.js
+│   │   ├── exchangeRateState.js
+│   │   ├── profileState.js
+│   │   └── transactionState.js
+│   └── ui/             # Modules for rendering UI components
+│       ├── appSettingsUI.js
+│       ├── categoryUI.js
+│       ├── dashboardUI.js
+│       ├── exchangeRateUI.js
+│       ├── modalUIs.js
+│       ├── profileUI.js
+│       └── transactionUI.js
+├── index.html          # Main HTML file
+└── README.md           # This file
 
-## Usage:
 
-1.  Ensure all files (`index.html` and the `js/` folder with its contents) are in the same directory.
-2.  **Serve the files using a local web server.** This is necessary because the application uses JavaScript Modules, which have CORS restrictions when opened directly via `file:///` protocol.
-    * **VS Code:** Use the "Live Server" extension.
-    * **Python:** Navigate to the project directory in your terminal and run `python -m http.server`. Then open `http://localhost:8000` in your browser.
-    * **Node.js:** Navigate to the project directory and run `npx serve`.
+## Getting Started:
 
-## Future Development Ideas:
+### Prerequisites:
 
-* **Import/Export for Exchange Rates:** Dedicated functionality within the "Manage Exchange Rates" modal to import and export *only* the exchange rates data (e.g., from/to a simple JSON file).
-* **Filtering Transactions:** Adding UI elements (e.g., dropdowns for category/type, date pickers) to filter the displayed transaction list.
-* **Data Visualization:** Incorporating charts (e.g., using a library like Chart.js or D3.js via CDN) to visualize financial data, such as:
-    * A pie chart for expenses by category.
-    * A bar chart for income vs. outcome over time.
+* A modern web browser that supports ES6 Modules (e.g., Chrome, Firefox, Edge, Safari).
+* An internet connection (for loading Tailwind CSS and Lucide Icons from CDNs).
+
+### Running Locally:
+
+1.  **Clone the repository (or download the files):**
+    ```bash
+    git clone [https://github.com/your-username/money-tracker-pro.git](https://github.com/your-username/money-tracker-pro.git)
+    cd money-tracker-pro
+    ```
+    (Replace `your-username/money-tracker-pro.git` with your actual repository URL if you've pushed it.)
+
+2.  **Open `index.html`:**
+    Simply open the `index.html` file in your web browser.
+
+    *Note: Some browsers might have security restrictions when running ES6 modules directly from the local file system (`file:///...`). If you encounter issues related to module loading, serving the files through a simple local web server is recommended. Many code editors (like VS Code with the "Live Server" extension) provide this functionality easily, or you can use Python's built-in HTTP server:*
+    ```bash
+    # If you have Python 3 installed
+    python -m http.server
+    ```
+    *Then navigate to `http://localhost:8000` (or the port shown) in your browser.*
+
+## How to Use:
+
+1.  **Profiles**:
+    * Click the "+" button in the "Profiles" section to add a new financial profile (e.g., "Personal Savings," "Work Expenses").
+    * Specify a name, currency, and the day your financial month starts.
+    * Click on a profile name in the list to view its details and transactions.
+    * Use the edit (pencil) and delete (trash) icons next to each profile to manage them.
+    * Click "View All Profiles" to see an aggregated dashboard view.
+
+2.  **Transactions**:
+    * Once a profile is selected (or "All Profiles" for adding to a specific profile if that feature is enhanced), use the "Add Income" or "Add Outcome" buttons.
+    * Fill in the description, amount, category, and date/time for the transaction.
+    * For outcomes, you can mark them as "reimbursed" (e.g., a work expense you'll get back).
+    * Edit or delete transactions from the list.
+
+3.  **App Settings**:
+    * **Display Currency**: Choose the currency for the "All Profiles" dashboard summary and as the default for new profiles.
+    * **App Theme**: Select Light, Dark, or Sepia theme.
+    * **Manage Categories**: Add, edit, or delete transaction categories.
+    * **Manage Exchange Rates**: View and update exchange rates. You can also import/export rates.
+
+4.  **Data Management**:
+    * **Import App Data**: Load all application data from a previously exported JSON file. This will overwrite current data.
+    * **Export App Data**: Save all current application data (profiles, transactions, settings, etc.) to a JSON file as a backup or for migration.
+
+5.  **Date Projection**:
+    * Use the "Preview Until" date picker in the dashboard header to see your financial summary projected up to a specific date. Click the calendar-X icon to reset to the current financial period.
+
+## Future Enhancements (Ideas):
+
+* Graphs and charts for visualizing spending patterns.
+* Recurring transactions.
+* Budgeting features.
+* More robust data validation.
+* User authentication and cloud sync (would require a backend).
+* Progressive Web App (PWA) capabilities for better offline use and installation.
+* Integration of a build step for Tailwind CSS (purging, `tailwind.config.js`) for production.
+* Unit and end-to-end testing.
+
+## Contributing:
+
+Contributions, issues, and feature requests are welcome. Please feel free to fork the repository and submit a pull request.
+
+## License:
+
+This project is license under GNU General Public License v3.0. Feel free to use, modify, and distribute. 

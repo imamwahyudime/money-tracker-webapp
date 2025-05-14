@@ -3,6 +3,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Money Tracker Pro</title>
+
+    <script>
+        (function() {
+            try {
+                // Ensure this STORAGE_KEY matches the one in your js/config.js
+                const STORAGE_KEY = 'moneyTrackerData_v3.0_modular';
+                const DEFAULT_THEME_VALUE = 'light'; // Should match DEFAULT_THEME in config.js
+                const AVAILABLE_THEME_VALUES = ['light', 'dark', 'sepia']; // Should match AVAILABLE_THEMES values in config.js
+
+                let preferredTheme = DEFAULT_THEME_VALUE;
+                const storedDataString = localStorage.getItem(STORAGE_KEY);
+
+                if (storedDataString) {
+                    const parsedData = JSON.parse(storedDataString);
+                    if (parsedData && parsedData.settings && parsedData.settings.currentTheme) {
+                        if (AVAILABLE_THEME_VALUES.includes(parsedData.settings.currentTheme)) {
+                            preferredTheme = parsedData.settings.currentTheme;
+                        }
+                    }
+                }
+                // No need for an else here, preferredTheme is already defaulted to light.
+                // An additional check for system preference could go here if desired in the future.
+
+                document.documentElement.setAttribute('data-theme', preferredTheme);
+            } catch (e) {
+                // If any error occurs (localStorage access, JSON parsing), default to light.
+                document.documentElement.setAttribute('data-theme', 'light'); // Fallback theme
+                console.error('Error applying initial theme from localStorage:', e);
+            }
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script>
@@ -14,325 +45,16 @@
                     },
                 }
             }
-
-            
             // We might add darkMode: 'class' or darkMode: ['class', '[data-theme="dark"]'] here later
             // if we want to leverage Tailwind's dark mode variants, but for now, CSS variables will do.
-            
         }
-
-        
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* CSS variables will be defined here later */
-        /* Styles remain the same as previous version... */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
-        .profile-item, .transaction-item, .category-item, .rate-item { transition: background-color 0.3s ease, border-color 0.3s ease; }
-        .profile-item:hover { background-color: #f0f9ff; border-left-color: #7dd3fc; }
-        .profile-item.active { background-color: #e0f2fe; border-left-width: 4px; border-left-color: #0ea5e9; font-weight: 500; }
-        .profile-item.active .profile-name { color: #0284c7; }
-        .transaction-item:hover, .category-item:hover, .rate-item:hover { background-color: #f8fafc; }
-        .icon-text-align { display: inline-flex; align-items: center; gap: 0.5rem; }
-        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal.modal-open { display: flex; }
-        .modal-content { background-color: #fefefe; padding: 24px; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: modalOpenAnimation 0.3s ease-out; }
-        @keyframes modalOpenAnimation { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .modal-close-btn { transition: transform 0.2s ease-in-out, background-color 0.2s; }
-        .modal-close-btn:hover { transform: rotate(90deg); background-color: #e2e8f0; }
-        input:focus, select:focus, button:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 2px theme('colors.sky.500'); }
-        .transaction-item button, .category-item button, .profile-item button { min-width: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center;}
-        .transaction-reimbursed { text-decoration: line-through; color: #64748b; /* slate-500 */ }
-        .transaction-reimbursed .font-semibold { color: #16a34a !important; /* green-600 for reimbursed amount */ text-decoration: none !important;}
-
-        /* Basic Theme Variables (will be expanded) */
-        :root {
-            --bg-primary: theme('colors.slate.100');
-            --bg-secondary: theme('colors.white');
-            --text-primary: theme('colors.slate.800');
-            --text-secondary: theme('colors.slate.500');
-            --text-accent: theme('colors.sky.600');
-            --border-primary: theme('colors.slate.300');
-            --border-secondary: theme('colors.slate.200');
-            --modal-bg: theme('colors.white');
-            --input-bg: theme('colors.white');
-            --input-border: theme('colors.slate.300');
-            --button-primary-bg: theme('colors.sky.500');
-            --button-primary-text: theme('colors.white');
-            --button-secondary-bg: theme('colors.slate.200');
-            --button-secondary-text: theme('colors.slate.700');
-            /* ... more variables as needed */
-        }
-        /* --- Dark Theme --- */
-        [data-theme="dark"] {
-            --bg-primary: theme('colors.slate.900');
-            --bg-secondary: theme('colors.slate.800');
-            --text-primary: theme('colors.slate.200');
-            --text-secondary: theme('colors.slate.400');
-            --text-accent: theme('colors.sky.400');
-            --border-primary: theme('colors.slate.700');
-            --border-secondary: theme('colors.slate.700');
-            --modal-bg: theme('colors.slate.800');
-            --input-bg: theme('colors.slate.700');
-            --input-border: theme('colors.slate.600');
-            --button-primary-bg: theme('colors.sky.600');
-            --button-primary-text: theme('colors.white');
-            --button-secondary-bg: theme('colors.slate.700');
-            --button-secondary-text: theme('colors.slate.200');
-
-            /* Specific overrides for dark theme */
-            --profile-item-hover-bg: theme('colors.slate.700');
-            --profile-item-active-bg: theme('colors.slate.700');
-            --profile-item-active-border: theme('colors.sky.500');
-            --profile-item-active-text: theme('colors.sky.300');
-            --transaction-item-hover-bg: theme('colors.slate.700');
-            --link-text: theme('colors.sky.400');
-            --link-text-hover: theme('colors.sky.300');
-            --icon-color: theme('colors.slate.400');
-            --icon-hover-color: theme('colors.sky.400');
-        }
-
-        [data-theme="dark"] ::-webkit-scrollbar-track { background: #2d3748; /* A darker track for dark mode */ }
-        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #4a5568; /* A mid-dark thumb */ }
-        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #718096; }
-
-        [data-theme="dark"] .profile-item:hover { background-color: var(--profile-item-hover-bg); border-left-color: var(--text-accent); }
-        [data-theme="dark"] .profile-item.active { background-color: var(--profile-item-active-bg); border-left-color: var(--profile-item-active-border); }
-        [data-theme="dark"] .profile-item.active .profile-name { color: var(--profile-item-active-text); }
-        [data-theme="dark"] .transaction-item:hover,
-        [data-theme="dark"] .category-item:hover,
-        [data-theme="dark"] .rate-item:hover { background-color: var(--transaction-item-hover-bg); }
-
-        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-         [data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-        [data-theme="dark"] select {
-            /* Basic styling for select in dark mode if default is hard to see */
-            /* background-image to change arrow color may be needed for full control */
-        }
-        [data-theme="dark"] .transaction-reimbursed {
-            color: theme('colors.slate.500'); /* Slightly lighter for dark mode */
-        }
-        [data-theme="dark"] .transaction-reimbursed .font-semibold { /* Amount text */
-            color: theme('colors.green.400') !important;
-        }
-
- /* Dark Theme Variables */
-        [data-theme="dark"] {
-            --bg-primary: theme('colors.slate.900');
-            --bg-secondary: theme('colors.slate.800');
-            --bg-tertiary: theme('colors.slate.700');
-
-            --text-primary: theme('colors.slate.100');
-            --text-secondary: theme('colors.slate.400');
-            --text-accent: theme('colors.sky.400');
-            --text-on-primary-button: theme('colors.white');
-            --text-on-secondary-button: theme('colors.slate.100');
-            --text-danger: theme('colors.red.400');
-            --text-success: theme('colors.green.400');
-
-            --border-primary: theme('colors.slate.600');
-            --border-secondary: theme('colors.slate.700');
-            --border-focus: theme('colors.sky.500');
-
-            --modal-bg: theme('colors.slate.800');
-            --modal-overlay-bg: rgba(0,0,0,0.7);
-
-            --input-bg: theme('colors.slate.700');
-            --input-border: theme('colors.slate.600');
-            --input-text: theme('colors.slate.100');
-            --input-placeholder-text: theme('colors.slate.500');
-
-            --button-primary-bg: theme('colors.sky.600');
-            --button-primary-bg-hover: theme('colors.sky.500');
-            --button-secondary-bg: theme('colors.slate.700');
-            --button-secondary-bg-hover: theme('colors.slate.600');
-            --button-danger-bg: theme('colors.red.600');
-            --button-danger-bg-hover: theme('colors.red.500');
-            --button-success-bg: theme('colors.green.600');
-            --button-success-bg-hover: theme('colors.green.500');
-
-            --profile-item-hover-bg: theme('colors.slate.700');
-            --profile-item-active-bg: theme('colors.slate.700'); /* Consider a slight diff from hover if needed */
-            --profile-item-active-border: theme('colors.sky.500');
-            --profile-item-active-text: theme('colors.sky.300');
-
-            --transaction-item-hover-bg: theme('colors.slate.700'); /* Darker hover */
-            --reimbursed-text-color: theme('colors.slate.400');
-            --reimbursed-amount-color: theme('colors.green.400');
-
-            --scrollbar-track-bg: theme('colors.slate.700');
-            --scrollbar-thumb-bg: theme('colors.slate.500');
-            --scrollbar-thumb-hover-bg: theme('colors.slate.400');
-        }
-
-        /* Sepia Theme Variables */
-        [data-theme="sepia"] {
-            --bg-primary: #f4ecd8;
-            --bg-secondary: #e9e0cf;
-            --bg-tertiary: #e0d8c7;
-
-            --text-primary: #5b4636;
-            --text-secondary: #7d6b5a;
-            --text-accent: #8c5a32;
-            --text-on-primary-button: #f4ecd8;
-            --text-on-secondary-button: #5b4636;
-            --text-danger: #a52a2a; /* Brown for danger */
-            --text-success: #556b2f; /* Dark Olive Green for success */
-
-            --border-primary: #d3c7b3;
-            --border-secondary: #c0b5a0;
-            --border-focus: #8c5a32;
-
-            --modal-bg: #e9e0cf;
-            --modal-overlay-bg: rgba(91,70,54,0.5); /* Brownish overlay */
-
-            --input-bg: #fdf6e3;
-            --input-border: #d3c7b3;
-            --input-text: #5b4636;
-            --input-placeholder-text: #8d7e6f;
-
-            --button-primary-bg: #8c5a32;
-            --button-primary-bg-hover: #7c4a22;
-            --button-secondary-bg: #d3c7b3;
-            --button-secondary-bg-hover: #c0b5a0;
-            --button-danger-bg: #b22222; /* Firebrick */
-            --button-danger-bg-hover: #8b0000; /* DarkRed */
-            --button-success-bg: #6b8e23; /* OliveDrab */
-            --button-success-bg-hover: #556b2f; /* DarkOliveGreen */
-
-
-            --profile-item-hover-bg: #e0d8c7;
-            --profile-item-active-bg: #d8cebc;
-            --profile-item-active-border: #8c5a32;
-            --profile-item-active-text: #7c4a22;
-
-            --transaction-item-hover-bg: #e0d8c7;
-            --reimbursed-text-color: #8f7a66;
-            --reimbursed-amount-color: #556b2f;
-
-            --scrollbar-track-bg: #e0d8c7;
-            --scrollbar-thumb-bg: #bcae99;
-            --scrollbar-thumb-hover-bg: #a89c88;
-        }
-
-        /* Base HTML and Body styles */
-        html {
-            font-family: theme('fontFamily.sans');
-        }
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.2s ease-out, color 0.2s ease-out;
-        }
-
-
-        [data-theme="sepia"] ::-webkit-scrollbar-track { background: #e0d8c7; }
-        [data-theme="sepia"] ::-webkit-scrollbar-thumb { background: #bcae99; }
-        [data-theme="sepia"] ::-webkit-scrollbar-thumb:hover { background: #a89c88; }
-
-        [data-theme="sepia"] .profile-item:hover { background-color: var(--profile-item-hover-bg); border-left-color: var(--text-accent); }
-        [data-theme="sepia"] .profile-item.active { background-color: var(--profile-item-active-bg); border-left-color: var(--profile-item-active-border); }
-        [data-theme="sepia"] .profile-item.active .profile-name { color: var(--profile-item-active-text); }
-        [data-theme="sepia"] .transaction-item:hover,
-        [data-theme="sepia"] .category-item:hover,
-        [data-theme="sepia"] .rate-item:hover { background-color: var(--transaction-item-hover-bg); }
-
-        [data-theme="sepia"] input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: contrast(0.5) sepia(0.3); /* Adjust for better visibility on sepia */
-        }
-        [data-theme="sepia"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: contrast(0.5) sepia(0.3);
-        }
-        /* Transaction specific colors for sepia */
-        [data-theme="sepia"] .text-green-600 { color: #556b2f !important; /* Dark Olive Green */ }
-        [data-theme="sepia"] .text-red-600 { color: #a52a2a !important; /* Brown */ }
-        [data-theme="sepia"] .text-sky-600 { color: var(--text-accent) !important; }
-
-        [data-theme="sepia"] .bg-green-500 { background-color: #6b8e23 !important; /* OliveDrab */ color: var(--button-primary-text) !important; }
-        [data-theme="sepia"] .bg-green-500:hover { background-color: #556b2f !important; }
-        [data-theme="sepia"] .bg-red-500 { background-color: #b22222 !important; /* Firebrick */ color: var(--button-primary-text) !important; }
-        [data-theme="sepia"] .bg-red-500:hover { background-color: #8b0000 !important; /* DarkRed */ }
-        [data-theme="sepia"] .bg-sky-500 { background-color: var(--button-primary-bg) !important; }
-        [data-theme="sepia"] .bg-sky-500:hover { background-color: #7c4a22 !important; }
-
-        [data-theme="sepia"] .transaction-reimbursed {
-            color: #8f7a66; /* Lighter brown for strikethrough */
-        }
-        [data-theme="sepia"] .transaction-reimbursed .font-semibold { /* Amount text */
-            color: #556b2f !important; /* Dark Olive Green for reimbursed amount */
-        }
-
-        /* Shared modal close button hover for dark/sepia */
-        [data-theme="dark"] .modal-close-btn:hover,
-        [data-theme="sepia"] .modal-close-btn:hover {
-            background-color: var(--border-primary); /* Or a slightly lighter shade of the modal bg */
-        }
-
-        /* Apply variables to elements more globally */
-        /* Sidebar specific */
-        aside { background-color: var(--bg-secondary) !important; } /* Ensure this overrides Tailwind utility */
-        aside h1, aside h2, aside label, aside p, aside span, aside button, aside select { color: var(--text-primary); }
-        aside #profilesListEl .profile-item { background-color: transparent; } /* Default state */
-        aside #profilesListEl .profile-item .profile-name { color: var(--text-primary); }
-        aside #profilesListEl .profile-item.active { background-color: var(--profile-item-active-bg); border-left-color: var(--profile-item-active-border); }
-        aside #profilesListEl .profile-item.active .profile-name { color: var(--profile-item-active-text); }
-        aside #profilesListEl .profile-item:hover { background-color: var(--profile-item-hover-bg); }
-        aside select, aside input[type="number"] { background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary); }
-        aside button:not(#addProfileBtn):not(#viewAllProfilesBtn):not(#importDataBtn):not(#exportDataBtn) { /* general secondary buttons */
-            background-color: var(--button-secondary-bg);
-            color: var(--button-secondary-text);
-        }
-        aside button:hover:not(#addProfileBtn):not(#viewAllProfilesBtn):not(#importDataBtn):not(#exportDataBtn) {
-             filter: brightness(95%); /* Slight darken on hover */
-        }
-        aside #addProfileBtn { color: var(--text-accent); } /* Keep this one special */
-        aside #viewAllProfilesBtn { background-color: var(--button-primary-bg); color: var(--button-primary-text); }
-         aside #viewAllProfilesBtn:hover { filter: brightness(90%);}
-
-        /* Main content */
-        main { background-color: var(--bg-primary) !important; }
-        main h2, main h3, main p, main label, main span { color: var(--text-primary); }
-        main #profileCurrencyInfoDisplay, main #activeDateRangeDisplay { color: var(--text-accent); }
-        main #projectionDateInput { background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary); }
-        main #summarySection > div { background-color: var(--bg-secondary); }
-        main #transactionsListContainer { background-color: var(--bg-secondary); }
-        main #transactionsListEl { border-color: var(--border-secondary); }
-        main #noTransactionsMessage { color: var(--text-secondary); }
-
-        /* Modals */
-        .modal-content { background-color: var(--modal-bg); color: var(--text-primary); }
-        .modal-content h3, .modal-content h4, .modal-content label, .modal-content p { color: var(--text-primary); }
-        .modal-content input, .modal-content select { background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary); }
-        .modal-content .modal-close-btn { color: var(--text-secondary); }
-        .modal-content form { border-color: var(--border-secondary); }
-        .modal-content button[type="submit"] { background-color: var(--button-primary-bg); color: var(--button-primary-text); }
-         .modal-content button[type="submit"]:hover {filter: brightness(90%);}
-        .modal-content button[type="button"]:not(.modal-close-btn) { /* Cancel buttons */
-            /* background-color: var(--button-secondary-bg); */ /* Making them more subtle */
-            color: var(--text-secondary);
-        }
-         .modal-content button[type="button"]:not(.modal-close-btn):hover {
-            background-color: var(--button-secondary-bg);
-         }
-
-
-        /* Styles applied to the body based on data-theme */
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        /* You will add more theme-specific CSS rules here later */
-    </style>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
-<body class="font-sans antialiased"> <div class="flex flex-col md:flex-row min-h-screen">
+<body class="font-sans antialiased">
+    <div class="flex flex-col md:flex-row min-h-screen">
         <aside class="w-full md:w-72 bg-secondary shadow-lg p-6 space-y-6 flex flex-col" style="background-color: var(--bg-secondary);">
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-bold" style="color: var(--text-accent);">MoneyTrack</h1>
@@ -355,12 +77,7 @@
                     <div class="mb-3">
                         <label for="appDisplayCurrencySelect" class="block text-xs font-medium mb-1" style="color: var(--text-secondary);">Display Currency (All & New):</label>
                         <select id="appDisplayCurrencySelect" name="currency" class="w-full p-2 border rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
-                            <option value="IDR">IDR - Indonesian Rupiah</option>
-                            <option value="USD">USD - US Dollar</option>
-                            <option value="JPY">JPY - Japanese Yen</option>
-                            <option value="EUR">EUR - Euro</option>
-                            <option value="SGD">SGD - Singapore Dollar</option>
-                        </select>
+                            </select>
                     </div>
                     <div class="mb-3"> <label for="themeSelector" class="block text-xs font-medium mb-1" style="color: var(--text-secondary);">App Theme:</label>
                         <select id="themeSelector" name="theme" class="w-full p-2 border rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"></select>
@@ -447,8 +164,7 @@
                     <div>
                         <label for="profileCurrencyInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Currency</label>
                         <select id="profileCurrencyInput" name="profileCurrency" class="w-full p-2 border rounded-md shadow-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
-                            <option value="IDR">IDR</option> <option value="USD">USD</option> <option value="JPY">JPY</option> <option value="EUR">EUR</option> <option value="SGD">SGD</option>
-                        </select>
+                            </select>
                     </div>
                     <div>
                         <label for="profileFinancialMonthStartDayInput" class="block text-sm font-medium mb-1" style="color: var(--text-secondary);">Financial Month Starts On (Day)</label>
@@ -566,12 +282,5 @@
     </div>
 
     <script type="module" src="js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                lucide.createIcons();
-            }
-        });
-    </script>
-</body>
+    </body>
 </html>
