@@ -1,6 +1,6 @@
 // js/config.js
 
-export const STORAGE_KEY = 'moneyTrackerData_v2.3_conversion'; // Incremented version
+export const STORAGE_KEY = 'moneyTrackerData_v2.5_themes'; // Incremented version
 
 export const CURRENCY_SYMBOLS = {
     IDR: 'Rp',
@@ -10,7 +10,7 @@ export const CURRENCY_SYMBOLS = {
     SGD: 'S$'
 };
 
-export const DEFAULT_DISPLAY_CURRENCY = 'IDR'; // Renamed from globalDefaultCurrency for clarity
+export const DEFAULT_DISPLAY_CURRENCY = 'IDR';
 
 export const DEFAULT_CATEGORIES = [
     { id: 'cat_income_salary', name: 'Salary', type: 'income' },
@@ -33,20 +33,27 @@ export const DEFAULT_CATEGORIES = [
     { id: 'cat_outcome_debt', name: 'Debt Repayment', type: 'outcome' },
     { id: 'cat_outcome_personal_care', name: 'Personal Care', type: 'outcome' },
     { id: 'cat_outcome_misc', name: 'Miscellaneous', type: 'outcome' },
-    { id: 'cat_uncategorized', name: 'Uncategorized', type: 'universal' } 
+    { id: 'cat_uncategorized', name: 'Uncategorized', type: 'universal' }
 ];
 
-// Default Exchange Rates
-// Rates are relative to the base currency.
-// 1 unit of base currency = X units of the target currency.
 export const DEFAULT_EXCHANGE_RATES = {
-    base: 'USD', // Default base currency
+    base: 'USD',
     rates: {
         'USD': 1,
-        'IDR': 15000, // 1 USD = 15000 IDR
-        'EUR': 0.92,  // 1 USD = 0.92 EUR
-        'JPY': 130,   // 1 USD = 130 JPY
-        'SGD': 1.35   // 1 USD = 1.35 SGD
+        'IDR': 16200, // Updated to current approximate rate for May 2025
+        'EUR': 0.92,
+        'JPY': 155, // Updated to current approximate rate for May 2025
+        'SGD': 1.35
     },
-    lastUpdated: new Date().toISOString() // Timestamp of when these defaults were set
+    lastUpdated: new Date().toISOString()
 };
+
+export const DEFAULT_FINANCIAL_MONTH_START_DAY = 1;
+
+// New Theme Configuration
+export const DEFAULT_THEME = 'light';
+export const AVAILABLE_THEMES = [
+    { value: 'light', name: 'Light Mode' },
+    { value: 'dark', name: 'Dark Mode' },
+    { value: 'sepia', name: 'Sepia (Eye-Friendly)' } // Using 'sepia' as the eye-friendly mode for now
+];

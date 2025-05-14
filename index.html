@@ -38,6 +38,8 @@
         .modal-close-btn:hover { transform: rotate(90deg); background-color: #e2e8f0; }
         input:focus, select:focus, button:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 2px theme('colors.sky.500'); }
         .transaction-item button, .category-item button, .profile-item button { min-width: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center;}
+        .transaction-reimbursed { text-decoration: line-through; color: #64748b; /* slate-500 */ }
+        .transaction-reimbursed .font-semibold { color: #16a34a !important; /* green-600 for reimbursed amount */ text-decoration: none !important;}
     </style>
 </head>
 <body class="bg-slate-100 font-sans antialiased">
@@ -99,9 +101,24 @@
 
         <main class="flex-1 p-6 md:p-8 bg-slate-50">
             <header class="mb-6">
-                <h2 id="currentProfileNameDisplay" class="text-3xl font-bold text-slate-800">Dashboard</h2>
-                <p id="profileCurrencyInfoDisplay" class="text-sm text-slate-500">Select a profile or view all.</p>
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                    <div>
+                        <h2 id="currentProfileNameDisplay" class="text-3xl font-bold text-slate-800">Dashboard</h2>
+                        <p id="profileCurrencyInfoDisplay" class="text-sm text-slate-500">Select a profile or view all.</p>
+                        <p id="activeDateRangeDisplay" class="text-xs text-sky-700 font-medium mt-1"></p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
+                        <div class="flex items-center gap-2">
+                            <label for="projectionDateInput" class="text-sm font-medium text-slate-600 whitespace-nowrap">Preview Until:</label>
+                            <input type="date" id="projectionDateInput" name="projectionDate" class="p-2 border border-slate-300 rounded-md shadow-sm text-sm focus:ring-sky-500 focus:border-sky-500">
+                        </div>
+                        <button id="resetProjectionDateBtn" title="Show all dates" class="p-2 rounded-md hover:bg-slate-200 text-slate-600 active:bg-slate-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-x-2"><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m17 17 4 4"/><path d="m21 17-4 4"/></svg>
+                        </button>
+                    </div>
+                </div>
             </header>
+
             <section id="summarySection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-green-600 mb-2 icon-text-align"> <svg data-lucide="arrow-up-circle" width="24" height="24"><use xlink:href="#lucide-arrow-up-circle"/></svg> Total Income </h3> <p id="totalIncomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
                 <div class="bg-white p-6 rounded-xl shadow-md"> <h3 class="text-lg font-semibold text-red-600 mb-2 icon-text-align"> <svg data-lucide="arrow-down-circle" width="24" height="24"><use xlink:href="#lucide-arrow-down-circle"/></svg> Total Outcome </h3> <p id="totalOutcomeDisplay" class="text-3xl font-bold text-slate-700">Rp0</p> </div>
@@ -122,8 +139,79 @@
         </main>
     </div>
 
-    <div id="profileModal" class="modal"> <div class="modal-content"> <div class="flex justify-between items-center mb-6"> <h3 id="profileModalTitle" class="text-xl font-semibold text-slate-700"></h3> <button id="closeProfileModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button> </div> <form id="profileForm"> <input type="hidden" id="profileIdInput"> <div class="mb-4"> <label for="profileNameInput" class="block text-sm font-medium text-slate-600 mb-1">Profile Name</label> <input type="text" id="profileNameInput" name="profileName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="mb-6"> <label for="profileCurrencyInput" class="block text-sm font-medium text-slate-600 mb-1">Currency</label> <select id="profileCurrencyInput" name="profileCurrency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm"> <option value="IDR">IDR</option> <option value="USD">USD</option> <option value="JPY">JPY</option> <option value="EUR">EUR</option> <option value="SGD">SGD</option> </select> </div> <div class="flex justify-end gap-3"> <button type="button" id="cancelProfileModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button> <button type="submit" id="saveProfileBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button> </div> </form> </div> </div>
-    <div id="transactionModal" class="modal"> <div class="modal-content"> <div class="flex justify-between items-center mb-6"> <h3 id="transactionModalTitle" class="text-xl font-semibold text-slate-700"></h3> <button id="closeTransactionModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button> </div> <form id="transactionForm"> <input type="hidden" id="transactionIdInput"> <input type="hidden" id="transactionTypeInput"> <div class="mb-4"> <label for="transactionDescriptionInput" class="block text-sm font-medium text-slate-600 mb-1">Description</label> <input type="text" id="transactionDescriptionInput" name="description" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="mb-4"> <label for="transactionAmountInput" class="block text-sm font-medium text-slate-600 mb-1">Amount</label> <input type="number" id="transactionAmountInput" name="amount" step="any" min="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="mb-4"> <label for="transactionCategoryInput" class="block text-sm font-medium text-slate-600 mb-1">Category</label> <select id="transactionCategoryInput" name="category" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> <option value="">-- Select --</option> </select> </div> <div class="mb-6"> <label for="transactionDateInput" class="block text-sm font-medium text-slate-600 mb-1">Date & Time</label> <input type="datetime-local" id="transactionDateInput" name="date" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="flex justify-end gap-3"> <button type="button" id="cancelTransactionModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button> <button type="submit" id="saveTransactionBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button> </div> </form> </div> </div>
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="profileModalTitle" class="text-xl font-semibold text-slate-700"></h3>
+                <button id="closeProfileModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button>
+            </div>
+            <form id="profileForm">
+                <input type="hidden" id="profileIdInput">
+                <div class="mb-4">
+                    <label for="profileNameInput" class="block text-sm font-medium text-slate-600 mb-1">Profile Name</label>
+                    <input type="text" id="profileNameInput" name="profileName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="profileCurrencyInput" class="block text-sm font-medium text-slate-600 mb-1">Currency</label>
+                        <select id="profileCurrencyInput" name="profileCurrency" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+                            <option value="IDR">IDR</option> <option value="USD">USD</option> <option value="JPY">JPY</option> <option value="EUR">EUR</option> <option value="SGD">SGD</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="profileFinancialMonthStartDayInput" class="block text-sm font-medium text-slate-600 mb-1">Financial Month Starts On (Day)</label>
+                        <input type="number" id="profileFinancialMonthStartDayInput" name="profileFinancialMonthStartDay" min="1" max="31" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                        <p class="text-xs text-slate-500 mt-1">Day of the month (1-31) your financial cycle begins.</p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelProfileModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button>
+                    <button type="submit" id="saveProfileBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="transactionModalTitle" class="text-xl font-semibold text-slate-700"></h3>
+                <button id="closeTransactionModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button>
+            </div>
+            <form id="transactionForm">
+                <input type="hidden" id="transactionIdInput">
+                <input type="hidden" id="transactionTypeInput">
+                <div class="mb-4">
+                    <label for="transactionDescriptionInput" class="block text-sm font-medium text-slate-600 mb-1">Description</label>
+                    <input type="text" id="transactionDescriptionInput" name="description" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="transactionAmountInput" class="block text-sm font-medium text-slate-600 mb-1">Amount</label>
+                        <input type="number" id="transactionAmountInput" name="amount" step="any" min="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="transactionCategoryInput" class="block text-sm font-medium text-slate-600 mb-1">Category</label>
+                        <select id="transactionCategoryInput" name="category" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> <option value="">-- Select --</option> </select>
+                    </div>
+                </div>
+                <div class="mb-4"> <label for="transactionDateInput" class="block text-sm font-medium text-slate-600 mb-1">Date & Time</label>
+                    <input type="datetime-local" id="transactionDateInput" name="date" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div id="reimbursementSection" class="mb-6 hidden"> <label for="transactionIsReimbursedInput" class="flex items-center gap-2 text-sm font-medium text-slate-600">
+                        <input type="checkbox" id="transactionIsReimbursedInput" name="isReimbursed" class="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                        Is this transaction reimbursed?
+                    </label>
+                    <p class="text-xs text-slate-500 mt-1">If checked, this outcome will be treated as effectively an income (or cancel out the expense) in summaries.</p>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelTransactionModalBtn" class="py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100">Cancel</button>
+                    <button type="submit" id="saveTransactionBtn" class="py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="categoryModal" class="modal"> <div class="modal-content"> <div class="flex justify-between items-center mb-6"> <h3 class="text-xl font-semibold text-slate-700">Manage Categories</h3> <button id="closeCategoryModalBtn" title="Close" class="p-1.5 rounded-full hover:bg-slate-200 text-slate-500 modal-close-btn"> <svg data-lucide="x" width="20" height="20"><use xlink:href="#lucide-x"/></svg> </button> </div> <form id="categoryForm" class="mb-6 pb-6 border-b border-slate-200"> <input type="hidden" id="categoryIdInput"> <div class="flex flex-col sm:flex-row gap-3 items-end"> <div class="flex-grow"> <label for="categoryNameInput" class="block text-sm font-medium text-slate-600 mb-1">Name</label> <input type="text" id="categoryNameInput" name="categoryName" class="w-full p-2 border border-slate-300 rounded-md shadow-sm" required> </div> <div class="flex-shrink-0"> <label for="categoryTypeInput" class="block text-sm font-medium text-slate-600 mb-1">Type</label> <select id="categoryTypeInput" name="categoryType" class="w-full sm:w-auto p-2 border border-slate-300 rounded-md shadow-sm" required> <option value="income">Income</option> <option value="outcome">Outcome</option> <option value="universal">Universal</option> </select> </div> <div class="flex-shrink-0"> <button type="submit" id="saveCategoryBtn" class="w-full sm:w-auto py-2 px-4 rounded-md bg-sky-500 text-white hover:bg-sky-600"> <span id="saveCategoryBtnText">Add</span> </button> <button type="button" id="cancelEditCategoryBtn" class="hidden w-full sm:w-auto py-2 px-4 rounded-md text-slate-700 hover:bg-slate-100 ml-2">Cancel</button> </div> </div> </form> <h4 class="text-lg font-semibold text-slate-700 mb-3">Existing Categories</h4> <div id="categoriesList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div> </div> </div>
 
     <div id="exchangeRateModal" class="modal">
